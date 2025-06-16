@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('herramientas', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('nombre');
+            $table->integer('cantidad');
+            $table->enum('estado', ['Disponible', 'Dañada', 'Reparacion'])->default('Disponible');
+            $table->double('precio', 15, 4);
         });
     }
 
