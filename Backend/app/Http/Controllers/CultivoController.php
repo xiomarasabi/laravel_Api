@@ -9,7 +9,7 @@ class CultivoController extends Controller
 {
     public function index()
     {
-        $cultivos = Cultivo::all();
+        $cultivos = Cultivo::with('especie', 'semillero')->get();
         return response()->json($cultivos);
     }
 
@@ -24,12 +24,13 @@ class CultivoController extends Controller
         ]);
 
         $cultivo = Cultivo::create($request->all());
+        $cultivo->load('especie', 'semillero');
         return response()->json($cultivo, 201);
     }
 
     public function show($id)
     {
-        $cultivo = Cultivo::findOrFail($id);
+        $cultivo = Cultivo::with('especie', 'semillero')->findOrFail($id);
         return response()->json($cultivo);
     }
 
@@ -46,6 +47,7 @@ class CultivoController extends Controller
         ]);
 
         $cultivo->update($request->all());
+        $cultivo->load('especie', 'semillero'); // Cargar relaciones
         return response()->json($cultivo);
     }
 

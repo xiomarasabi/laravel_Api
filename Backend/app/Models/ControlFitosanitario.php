@@ -15,7 +15,13 @@ class ControlFitosanitario extends Model
         'fecha_control',
         'descripcion',
         'fk_id_desarrollan',
+        'detalle', // Añadido para consistencia con frontend
     ];
 
     public $timestamps = false;
+
+    public function desarrollan()
+    {
+        return $this->belongsTo(Desarrollan::class, 'fk_id_desarrollan');
+    }
 }

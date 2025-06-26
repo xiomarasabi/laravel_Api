@@ -20,4 +20,14 @@ class Cultivo extends Model
     ];
 
     public $timestamps = false;
+
+    public function especie()
+    {
+        return $this->belongsTo(Especie::class, 'fk_id_especie');
+    }
+
+    public function semillero()
+    {
+        return $this->belongsTo(Semillero::class, 'fk_id_semillero');
+    }
 }

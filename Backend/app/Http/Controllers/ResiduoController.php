@@ -9,7 +9,7 @@ class ResiduoController extends Controller
 {
     public function index()
     {
-        $residuos = Residuo::all();
+        $residuos = Residuo::with('tipo_residuo', 'cultivo')->get();
         return response()->json($residuos);
     }
 
@@ -24,17 +24,21 @@ class ResiduoController extends Controller
         ]);
 
         $residuo = Residuo::create($request->all());
+        $residuo->load('tipo_residuo', 'cultivo');
 
         return response()->json([
-            'message' => 'Residuos registrados correctamente',
+            'message' => 'Residuo registrado correctamente',
             'residuo' => $residuo
         ], 201);
     }
 
     public function show($id)
     {
-        $residuo = Residuo::findOrFail($id);
-        return response()->json($residuo);
+        $residuo = Residuo::with('tipo_residuo', 'cultivo')->findOrFail($id);
+        return response()->json([
+            'message' => 'Residuo obtenido correctamente',
+            'residuo' => $residuo
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -50,8 +54,12 @@ class ResiduoController extends Controller
         ]);
 
         $residuo->update($request->all());
+        $residuo->load('tipo_residuo', 'cultivo');
 
-        return response()->json($residuo);
+        return response()->json([
+            'message' => 'Residuo actualizado correctamente',
+            'residuo' => $residuo
+        ]);
     }
 
     public function destroy($id)

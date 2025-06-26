@@ -9,7 +9,7 @@ class ControlFitosanitarioController extends Controller
 {
     public function index()
     {
-        $controlFitosanitarios = ControlFitosanitario::all();
+        $controlFitosanitarios = ControlFitosanitario::with('desarrollan.cultivo', 'desarrollan.pea')->get();
         return response()->json($controlFitosanitarios);
     }
 
@@ -19,9 +19,11 @@ class ControlFitosanitarioController extends Controller
             'fecha_control' => 'required|date',
             'descripcion' => 'required|string',
             'fk_id_desarrollan' => 'required|exists:desarrollan,id',
+            'detalle' => 'nullable|string', // Añadido para consistencia
         ]);
 
         $controlFitosanitario = ControlFitosanitario::create($request->all());
+        $controlFitosanitario->load('desarrollan.cultivo', 'desarrollan.pea');
 
         return response()->json([
             'message' => 'Control fitosanitario registrado correctamente',
@@ -31,7 +33,7 @@ class ControlFitosanitarioController extends Controller
 
     public function show($id)
     {
-        $controlFitosanitario = ControlFitosanitario::findOrFail($id);
+        $controlFitosanitario = ControlFitosanitario::with('desarrollan.cultivo', 'desarrollan.pea')->findOrFail($id);
         return response()->json($controlFitosanitario);
     }
 
@@ -43,9 +45,11 @@ class ControlFitosanitarioController extends Controller
             'fecha_control' => 'date',
             'descripcion' => 'string',
             'fk_id_desarrollan' => 'exists:desarrollan,id',
+            'detalle' => 'nullable|string',
         ]);
 
         $controlFitosanitario->update($request->all());
+        $controlFitosanitario->load('desarrollan.cultivo', 'desarrollan.pea');
 
         return response()->json($controlFitosanitario);
     }

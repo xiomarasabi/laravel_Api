@@ -1,7 +1,5 @@
-// src/components/Cultivos.tsx
-
 import { useState } from 'react';
-import { useCultivo, Cultivos } from '../../../hooks/trazabilidad/cultivo/useCultivo'; // Importamos la interfaz Cultivos
+import { useCultivo, Cultivos } from '../../../hooks/trazabilidad/cultivo/useCultivo';
 import VentanaModal from '../../globales/VentanasModales';
 import Tabla from '../../globales/Tabla';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 
 const CultivosComponent = () => {
   const { data: cultivos, isLoading, error } = useCultivo();
-  const [selectedCultivo, setSelectedCultivo] = useState<Cultivos | null>(null); // Usamos la interfaz Cultivos
+  const [selectedCultivo, setSelectedCultivo] = useState<Cultivos | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -25,7 +23,7 @@ const CultivosComponent = () => {
   };
 
   const handleRowClick = (cultivo: { id: number }) => {
-    const selected = cultivos?.find((c) => c.id_cultivo === cultivo.id);
+    const selected = cultivos?.find((c) => c.id === cultivo.id);
     if (selected) openModalHandler(selected);
   };
 
@@ -49,8 +47,6 @@ const CultivosComponent = () => {
       cultivo.descripcion,
       cultivo.especie,
       cultivo.semillero,
-      cultivo.nombre_cientifico || 'N/A',
-      cultivo.tipo_cultivo || 'N/A',
     ]);
 
     autoTable(doc, {
@@ -75,7 +71,7 @@ const CultivosComponent = () => {
   const cultivosList = Array.isArray(cultivos) ? cultivos : [];
 
   const mappedCultivos = cultivosList.map((cultivo) => ({
-    id: cultivo.id_cultivo,
+    id: cultivo.id,
     nombre: cultivo.nombre_cultivo,
     fecha_plantacion: new Date(cultivo.fecha_plantacion).toLocaleDateString('es-CO', {
       year: 'numeric',
@@ -83,17 +79,15 @@ const CultivosComponent = () => {
       day: 'numeric',
     }),
     descripcion: cultivo.descripcion || 'Sin descripción',
-    especie: cultivo.fk_id_especie?.nombre_comun || 'Sin especie',
-    semillero: cultivo.fk_id_semillero?.nombre_semilla || 'Sin semillero',
-    nombre_cientifico: cultivo.fk_id_especie?.nombre_cientifico || 'N/A',
-    tipo_cultivo: cultivo.fk_id_especie?.fk_id_tipo_cultivo?.nombre || 'N/A',
+    especie: cultivo.fk_id_especie?.nombre_comun || 'No asignada',
+    semillero: cultivo.fk_id_semillero?.nombre_semilla || 'No asignado',
   }));
 
   const headers = [
     'ID',
     'Nombre',
-    'Fecha_Plantacion',
-    'descripcion',
+    'Fecha Plantacion',
+    'Descripcion',
     'Especie',
     'Semillero',
   ];
@@ -127,21 +121,12 @@ const CultivosComponent = () => {
           onClose={closeModal}
           titulo="Detalles del Cultivo"
           contenido={{
-            ID: selectedCultivo.id_cultivo,
+            ID: selectedCultivo.id,
             Nombre: selectedCultivo.nombre_cultivo,
             'Fecha Plantación': new Date(selectedCultivo.fecha_plantacion).toLocaleDateString('es-CO'),
-            Descripción: selectedCultivo.descripcion,
-            Especie: selectedCultivo.fk_id_especie?.nombre_comun || 'Sin especie',
-            'Nombre Científico': selectedCultivo.fk_id_especie?.nombre_cientifico || 'N/A',
-            'Tipo de Cultivo': selectedCultivo.fk_id_especie?.fk_id_tipo_cultivo?.nombre || 'N/A',
-            Semillero: selectedCultivo.fk_id_semillero?.nombre_semilla || 'Sin semillero',
-            'Fecha Siembra': selectedCultivo.fk_id_semillero?.fecha_siembra
-              ? new Date(selectedCultivo.fk_id_semillero.fecha_siembra).toLocaleDateString('es-CO')
-              : 'N/A',
-            'Fecha Estimada': selectedCultivo.fk_id_semillero?.fecha_estimada
-              ? new Date(selectedCultivo.fk_id_semillero.fecha_estimada).toLocaleDateString('es-CO')
-              : 'N/A',
-            Cantidad: selectedCultivo.fk_id_semillero?.cantidad || 'N/A',
+            Descripción: selectedCultivo.descripcion || 'Sin descripción',
+            Especie: selectedCultivo.fk_id_especie?.nombre_comun || 'No asignada',
+            Semillero: selectedCultivo.fk_id_semillero?.nombre_semilla || 'No asignado',
           }}
         />
       )}

@@ -1,55 +1,57 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || 'http://localhost:8000/api';
 
 export interface Pea {
-  id_pea: number;
+  id: number;
   nombre: string;
-  descripcion: string;
+  descripcion: string | null;
 }
 
-const fetchPeaPorId = async (id_pea: string | undefined): Promise<Pea> => {
-  if (!id_pea || isNaN(parseInt(id_pea))) {
+const fetchPeaPorId = async (id: string | undefined): Promise<Pea> => {
+  if (!id || isNaN(parseInt(id))) {
     throw new Error('ID de PEA inválido');
   }
 
   try {
     const token = localStorage.getItem('token');
-    if (!apiUrl) {
-      throw new Error('La variable de entorno VITE_API_URL no está definida.');
-    }
     if (!token) {
       throw new Error('No hay token disponible. Por favor, inicia sesión.');
     }
 
-    console.log('📤 Enviando solicitud GET /pea/:id_pea:', { id_pea });
-    const { data } = await axios.get(`${apiUrl}pea/${id_pea}`, {
+    console.log('📤 Enviando solicitud GET /api/peas/:id:', { id });
+    const { data } = await axios.get(`${apiUrl}/peas/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
-    console.log('📥 Respuesta del backend (PEA por ID):', data.pea);
-    if (!data.pea) {
-      throw new Error('PEA no encontrado');
-    }
-    return data.pea;
+    console.log('📥 Respuesta del backend (PEA por ID):', data);
+    return data;
   } catch (error: any) {
     console.error('❌ Error al obtener el PEA:', error);
+    console.error('Detalles del error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
     if (error.response?.status === 403) {
-      localStorage.removeItem('token'); // Limpiar token inválido
       throw new Error('Sesión inválida. Por favor, inicia sesión nuevamente.');
     }
-    throw error instanceof Error ? error : new Error('No se pudo obtener el PEA');
+    if (error.response?.status === 404) {
+      throw new Error('PEA no encontrado');
+    }
+    throw new Error(error.response?.data?.message || 'No se pudo obtener el PEA');
   }
 };
 
-export const usePeaPorId = (id_pea: string | undefined) => {
+export const usePeaPorId = (id: string | undefined) => {
   return useQuery<Pea, Error>({
-    queryKey: ['pea', id_pea],
-    queryFn: () => fetchPeaPorId(id_pea),
-    enabled: !!id_pea && !isNaN(parseInt(id_pea)),
+    queryKey: ['Pea', id],
+    queryFn: () => fetchPeaPorId(id),
+    enabled: !!id && !isNaN(parseInt(id)),
     retry: 1,
     staleTime: 0,
     gcTime: 0,
