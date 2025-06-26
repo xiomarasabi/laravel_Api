@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\AsignacionActividadesController;
+use App\Http\Controllers\CalendarioLunarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HerramientaController;
 use App\Http\Controllers\InsumoController;
@@ -18,6 +21,9 @@ use App\Http\Controllers\ResiduoController;
 use App\Http\Controllers\PeaController;
 use App\Http\Controllers\DesarrollanController;
 use App\Http\Controllers\ControlFitosanitarioController;
+use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\ProgramacionController;
+use App\Http\Controllers\RealizaController;
 
 Route::apiResource('produccion', ProduccionController::class);
 Route::apiResource('ventas', VentaController::class);
@@ -39,9 +45,9 @@ Route::apiResource('desarrollan', DesarrollanController::class);
 Route::apiResource('control_fitosanitario', ControlFitosanitarioController::class);
 
 
-Route::apiResource('actividad', HerramientaController::class);
-Route::apiResource('asignacion_actividades', HerramientaController::class);
-Route::apiResource('calendario_lunar', HerramientaController::class);
-Route::apiResource('notificacion', HerramientaController::class);
-Route::apiResource('programacion', HerramientaController::class);
-Route::apiResource('realiza', HerramientaController::class);
+Route::apiResource('actividad', ActividadController::class);
+Route::apiResource('asignacion_actividades', AsignacionActividadesController::class);
+Route::apiResource('calendario_lunar', CalendarioLunarController::class);
+Route::apiResource('notificacion', NotificacionController::class);
+Route::apiResource('programacion', ProgramacionController::class);
+Route::apiResource('realiza', RealizaController::class);
