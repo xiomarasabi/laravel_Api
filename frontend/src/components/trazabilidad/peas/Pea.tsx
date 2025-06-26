@@ -1,18 +1,24 @@
 import { useState } from 'react';
-import { usePea } from '../../../hooks/trazabilidad/pea/usePea';
-import VentanaModal from '../../globales/VentanasModales';
-import Tabla from '../../globales/Tabla';
+import { usePea } from '@/hooks/trazabilidad/pea/usePea';
+import VentanaModal from '@/components/globales/VentanasModales';
+import Tabla from '@/components/globales/Tabla';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const Pea = () => {
   const { data: peas = [], isLoading, error } = usePea();
-  const [selectedPea, setSelectedPea] = useState<object | null>(null);
+  const [selectedPea, setSelectedPea] = useState<Pea | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const openModalHandler = (pea: object) => {
+  interface Pea {
+    id: number;
+    nombre: string;
+    descripcion: string | null;
+  }
+
+  const openModalHandler = (pea: Pea) => {
     setSelectedPea(pea);
     setIsModalOpen(true);
   };
@@ -22,12 +28,12 @@ const Pea = () => {
     setIsModalOpen(false);
   };
 
-  const handleRowClick = (pea: object) => {
+  const handleRowClick = (pea: Pea) => {
     openModalHandler(pea);
   };
 
-  const handleUpdate = (pea: { id_pea: number }) => {
-    navigate(`/pea/editar/${pea.id_pea}`);
+  const handleUpdate = (pea: { id: number }) => {
+    navigate(`/pea/editar/${pea.id}`);
   };
 
   const handleCreate = () => {
@@ -38,7 +44,7 @@ const Pea = () => {
   if (error) return <div className="text-center text-red-500 py-4">Error al cargar los PEAs: {error.message}</div>;
 
   const mappedPeas = peas.map(pea => ({
-    id_pea: pea.id_pea,
+    id: pea.id,
     nombre: pea.nombre,
     descripcion: pea.descripcion || 'Sin descripción',
   }));
@@ -49,7 +55,7 @@ const Pea = () => {
     doc.text('PEAs Registrados', 14, 15);
 
     const tableData = mappedPeas.map(pea => [
-      pea.id_pea,
+      pea.id,
       pea.nombre,
       pea.descripcion,
     ]);
@@ -65,7 +71,7 @@ const Pea = () => {
     doc.save('PEAs_Registrados.pdf');
   };
 
-  const headers = [ 'Nombre', 'Descripcion'];
+  const headers = ['id', 'nombre', 'descripcion'];
 
   return (
     <div className="overflow-x-auto rounded-lg p-4">
@@ -75,12 +81,6 @@ const Pea = () => {
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Generar PDF
-        </button>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Crear PEA
         </button>
       </div>
       <Tabla

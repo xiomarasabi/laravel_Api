@@ -20,4 +20,14 @@ class Residuo extends Model
     ];
 
     public $timestamps = false;
+
+    public function tipo_residuo()
+    {
+        return $this->belongsTo(TipoResiduo::class, 'fk_id_tipo_residuo');
+    }
+
+    public function cultivo()
+    {
+        return $this->belongsTo(Cultivo::class, 'fk_id_cultivo');
+    }
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCrearCultivo, fetchEspecies, fetchSemilleros } from '../../../hooks/trazabilidad/cultivo/useCrearCultivos';
+import { useCrearCultivo, fetchEspecies, fetchSemilleros, Especie, Semillero } from '../../../hooks/trazabilidad/cultivo/useCrearCultivos';
 import Formulario from '../../../components/globales/Formulario';
 
 interface FormErrors {
@@ -21,18 +21,6 @@ interface FormField {
   options?: Array<{ value: string; label: string }>;
 }
 
-interface Especie {
-  id_especie: number;
-  nombre_comun: string;
-  nombre_cientifico: string;
-}
-
-interface Semillero {
-  id_semillero: number;
-  nombre_semilla: string;
-  fecha_siembra: string;
-}
-
 const CrearCultivo = () => {
   const { mutate, isPending, isError, error } = useCrearCultivo();
   const navigate = useNavigate();
@@ -41,12 +29,12 @@ const CrearCultivo = () => {
   const [semilleros, setSemilleros] = useState<Semillero[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null); // Nuevo estado para errores de envío
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
+      return date.toLocaleDateString('es-CO', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -81,7 +69,7 @@ const CrearCultivo = () => {
         if (especiesData.length === 0 && semillerosData.length === 0) {
           setDataError('No se encontraron especies ni semilleros. Verifica la conexión con el servidor o las rutas de la API.');
         } else if (especiesData.length === 0) {
-          setDataError('No se encontraron especies. Verifica el endpoint /especie.');
+          setDataError('No se encontraron especies. Verifica el endpoint /especies.');
         } else if (semillerosData.length === 0) {
           setDataError('No se encontraron semilleros. Verifica el endpoint /semilleros.');
         } else {
@@ -117,10 +105,10 @@ const CrearCultivo = () => {
     },
     {
       id: 'descripcion',
-      label: 'Descripción*',
+      label: 'Descripción',
       type: 'textarea',
       placeholder: 'Descripción del cultivo...',
-      required: true,
+      required: false, // Ajustado porque es nullable en el backend
       error: formErrors.descripcion,
     },
     {
@@ -131,7 +119,7 @@ const CrearCultivo = () => {
         ? [
             { value: '', label: 'Seleccione una especie...' },
             ...especies.map(e => ({
-              value: e.id_especie.toString(),
+              value: e.id.toString(),
               label: `${e.nombre_comun || 'Sin nombre'} (${e.nombre_cientifico || 'Sin nombre científico'})`,
             })),
           ]
@@ -147,7 +135,7 @@ const CrearCultivo = () => {
         ? [
             { value: '', label: 'Seleccione un semillero...' },
             ...semilleros.map(s => ({
-              value: s.id_semillero.toString(),
+              value: s.id.toString(),
               label: `${s.nombre_semilla || 'Semillero sin nombre'} (Siembra: ${formatDate(s.fecha_siembra)})`,
             })),
           ]
@@ -171,8 +159,9 @@ const CrearCultivo = () => {
       isValid = false;
     }
 
-    if (!formData.descripcion?.trim()) {
-      errors.descripcion = 'La descripción es obligatoria';
+    // Descripción es opcional, no validamos si está vacía
+    if (formData.descripcion && formData.descripcion.length > 255) {
+      errors.descripcion = 'La descripción no debe exceder 255 caracteres';
       isValid = false;
     }
 
@@ -191,20 +180,20 @@ const CrearCultivo = () => {
   };
 
   const handleSubmit = (formData: Record<string, string>) => {
-    setSubmitError(null); // Limpiar error previo
+    setSubmitError(null);
     if (!validateForm(formData)) return;
 
     const cultivoData = {
       nombre_cultivo: formData.nombre_cultivo.trim(),
       fecha_plantacion: formData.fecha_plantacion,
-      descripcion: formData.descripcion.trim(),
+      descripcion: formData.descripcion.trim() || null, // Enviar null si está vacío
       fk_id_especie: parseInt(formData.fk_id_especie, 10),
       fk_id_semillero: parseInt(formData.fk_id_semillero, 10),
     };
 
     mutate(cultivoData, {
       onSuccess: () => {
-        console.log('handleSubmit: Redirigiendo a /cultivo'); // Debug
+        console.log('handleSubmit: Redirigiendo a /cultivos'); // Debug
         navigate('/cultivo');
       },
       onError: (err: any) => {

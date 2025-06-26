@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { useControlFitosanitario } from '../../../hooks/trazabilidad/control/useControlFitosanitario';
+import { useControlFitosanitario, ControlFitosanitario } from '../../../hooks/trazabilidad/control/useControlFitosanitario';
 import VentanaModal from '../../globales/VentanasModales';
 import Tabla from '../../globales/Tabla';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const ControlFitosanitario = () => {
-  const { data: controles, isLoading, error } = useControlFitosanitario();
-  const [selectedControl, setSelectedControl] = useState<null | object>(null);
+const ControlFitosanitariosComponent = () => {
+  const { data: controlFitosanitarios, isLoading, error } = useControlFitosanitario();
+  const [selectedControl, setSelectedControl] = useState<ControlFitosanitario | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const openModalHandler = (control: object) => {
+  const openModalHandler = (control: ControlFitosanitario) => {
     setSelectedControl(control);
     setIsModalOpen(true);
   };
@@ -22,80 +22,78 @@ const ControlFitosanitario = () => {
     setIsModalOpen(false);
   };
 
-  const handleRowClick = (control: object) => {
-    openModalHandler(control);
+  const handleRowClick = (control: { id: number }) => {
+    const selected = controlFitosanitarios?.find((c) => c.id === control.id);
+    if (selected) openModalHandler(selected);
   };
 
-  const handleUpdate = (control: { id_control_fitosanitario: number }) => {
-    navigate(`/controlfitosanitario/editar/${control.id_control_fitosanitario}`);
+  const handleUpdate = (control: { id: number }) => {
+    navigate(`/controlfitosanitario/editar/${control.id}`); // Corregido
   };
 
   const handleCreate = () => {
     navigate('/crearcontrolfitosanitario');
   };
 
-  if (isLoading) return <div>Cargando Controles Fitosanitarios...</div>;
-  if (error instanceof Error) return <div>Error al cargar los controles: {error.message}</div>;
-
-  const controlesList = Array.isArray(controles) ? controles : [];
-
-  const mappedControles = controlesList.map(control => ({
-    id_control_fitosanitario: control.id_control_fitosanitario,
-    fecha_control: control.fecha_control ? new Date(control.fecha_control).toLocaleDateString('es-CO') : 'Sin fecha',
-    descripcion: control.descripcion || 'Sin descripción',
-    cultivo: control.desarrollan?.cultivo?.nombre_cultivo || 'Sin cultivo',
-    pea: control.desarrollan?.pea?.nombre || 'Sin PEA',
-    especie: (control.desarrollan?.cultivo as any)?.especie?.nombre_comun || 'Sin especie', // Solución temporal
-    detalle: control.detalle,
-   
-
-     
-
-  }));
-
   const generarPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Controles Generados', 14, 15);
+    doc.text('Controles Fitosanitarios', 14, 15);
 
     const tableData = mappedControles.map((control) => [
-      control.id_control_fitosanitario,
+      control.id,
       control.fecha_control,
       control.descripcion,
       control.cultivo,
       control.pea,
-      control.especie,
-      control.detalle,
-      
-
     ]);
 
     autoTable(doc, {
-      head: [['iD', 'Fecha Control', 'Descripcion', 'Cultivo', 'PEA', 'Especie', 'detalle']],
+      head: [['ID', 'Fecha Control', 'Descripción', 'Cultivo', 'PEA']],
       body: tableData,
       startY: 20,
       styles: { fontSize: 10 },
-      headStyles: { fillColor: [34, 197, 94] },
+      headStyles: { fillColor: [22, 101, 52] },
     });
 
-    doc.save('Controles_generados.pdf');
+    doc.save('controles-fitosanitarios.pdf');
   };
 
-  const headers = [ 'Fecha Control', 'descripcion', 'Cultivo', 'PEA', 'Especie', 'detalle'];
+  if (isLoading) return <div className="text-center">Cargando controles...</div>;
+  if (error)
+    return (
+      <div className="text-red-500 text-center">
+        Error al cargar los controles: {error.message}
+      </div>
+    );
+
+  const controlesList = Array.isArray(controlFitosanitarios) ? controlFitosanitarios : [];
+
+  const mappedControles = controlesList.map((control) => ({
+    id: control.id,
+    fecha_control: new Date(control.fecha_control).toLocaleDateString('es-CO'),
+    descripcion: control.descripcion || 'Sin descripción',
+    cultivo: control.desarrollan.cultivo.nombre_cultivo || 'Sin cultivo',
+    pea: control.desarrollan.pea.nombre || 'Sin PEA',
+  }));
+
+  const headers = ['ID', 'Fecha Control', 'Descripcion', 'Cultivo', 'PEA'];
 
   return (
-    <div className="overflow-x-auto rounded-lg">
-      <div className="flex justify-end items-center mb-4">
-        <button
-          onClick={generarPDF}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Reporte PDF
-        </button>
+    <div className="overflow-x-auto shadow-md rounded-lg p-4">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <button
+            onClick={generarPDF}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
+          >
+            Generar Reporte PDF
+          </button>
+        </div>
       </div>
 
       <Tabla
-        title="Lista de Controles Fitosanitarios"
+        title="Listar Controles Fitosanitarios"
         headers={headers}
         data={mappedControles}
         onClickAction={handleRowClick}
@@ -109,11 +107,17 @@ const ControlFitosanitario = () => {
           isOpen={isModalOpen}
           onClose={closeModal}
           titulo="Detalles del Control Fitosanitario"
-          contenido={selectedControl}
+          contenido={{
+            ID: selectedControl.id,
+            'Fecha Control': new Date(selectedControl.fecha_control).toLocaleDateString('es-CO'),
+            Descripción: selectedControl.descripcion || 'Sin descripción',
+            Cultivo: selectedControl.desarrollan.cultivo.nombre_cultivo || 'Sin cultivo',
+            PEA: selectedControl.desarrollan.pea.nombre || 'Sin PEA',
+          }}
         />
       )}
     </div>
   );
 };
 
-export default ControlFitosanitario;
+export default ControlFitosanitariosComponent;
