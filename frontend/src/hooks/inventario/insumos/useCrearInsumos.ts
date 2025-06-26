@@ -8,6 +8,7 @@ export interface Insumo {
     tipo: string ;
     precio_unidad: number;
     cantidad: number;
+    fecha_vencimiento: string | Date;
     unidad_medida: string;
 }
 
@@ -16,19 +17,17 @@ export const useCrearInsumos = () => {
 
     return useMutation({
         mutationFn: async (nuevoHerramienta: Insumo) => {
-            const token = localStorage.getItem("token");
-            console.log(token);
-            console.log(nuevoHerramienta)
-            if (!token) {
-                throw new Error("No se ha encontrado un token de autenticación");
-            }
+            // const token = localStorage.getItem("token");
+            //if (!token) {
+            //    throw new Error("No se ha encontrado un token de autenticación");
+            //}
             const data  = await axios.post(
-                `${apiUrl}insumo/`,
+                `${apiUrl}insumos/`,
                 nuevoHerramienta,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    //headers: {
+                    //    Authorization: `Bearer ${token}`,
+                    //},
                 }
             );
             return data;

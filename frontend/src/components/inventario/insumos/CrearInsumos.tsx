@@ -15,6 +15,7 @@ const CrearInsumos = () => {
     { id: 'tipo', label: 'Tipo', type: 'text' },
     { id: 'precio_unidad', label: 'Precio por Unidad', type: 'number' },
     { id: 'cantidad', label: 'Cantidad', type: 'number' },
+    { id: 'fecha_vencimiento', label: 'Fecha vencimiento', type: 'date' },
     { id: 'unidad_medida', label: 'Unidad de Medida', type: 'text' },
   ];
 
@@ -24,6 +25,7 @@ const CrearInsumos = () => {
       tipo: formData.tipo,
       precio_unidad: parseFloat(formData.precio_unidad),
       cantidad: parseInt(formData.cantidad),
+      fecha_vencimiento: formData.fecha_vencimiento,
       unidad_medida: formData.unidad_medida,
     };
     mutation.mutate(nuevoInsumo);

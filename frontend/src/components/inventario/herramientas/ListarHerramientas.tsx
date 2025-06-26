@@ -24,8 +24,8 @@ const ListarHerramientas = () => {
     setIsModalOpen(false);
   };
 
-  const handleUpdate = (herramienta: { id_herramienta: number }) => {
-    navigate(`/ActualizarHerramienta/${herramienta.id_herramienta}`);
+  const handleUpdate = (herramienta: { id: number }) => {
+    navigate(`/ActualizarHerramienta/${herramienta.id}`);
   };
 
   const handleCreate = () => {
@@ -38,23 +38,18 @@ const ListarHerramientas = () => {
 
   const mappedHerramientas =
     herramientas?.map((h) => ({
-      id_herramienta: h.id_herramienta,
-      nombre: h.nombre_h,
+      id: h.id,
+      nombre: h.nombre,
+      cantidad: h.cantidad,
+      precio: h.precio,
       estado: h.estado,
-      fecha_prestamo: h.fecha_prestamo
-        ? new Date(h.fecha_prestamo).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          })
-        : "N/A",
     })) || [];
 
   return (
     <div>
       <Tabla
         title="Herramientas"
-        headers={["id herramienta", "Nombre", "Estado", "Fecha Prestamo"]}
+        headers={["id", "Nombre", "cantidad","precio","Estado"]}
         data={mappedHerramientas}
         onClickAction={handleRowClick}
         onUpdate={handleUpdate}
@@ -67,18 +62,11 @@ const ListarHerramientas = () => {
           onClose={closeModal}
           titulo="Detalles de Herramienta"
           contenido={{
-            id_herramienta: selectedHerramientas.id_herramienta,
-            nombre: selectedHerramientas.nombre_h,
+            id_herramienta: selectedHerramientas.id,
+            nombre: selectedHerramientas.nombre,
+            cantidad: selectedHerramientas.cantidad,
             estado: selectedHerramientas.estado,
-            fecha_prestamo: selectedHerramientas.fecha_prestamo
-              ? new Date(
-                  selectedHerramientas.fecha_prestamo
-                ).toLocaleDateString("es-ES", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                })
-              : "N/A",
+            precio: selectedHerramientas.precio
           }}
         />
       )}

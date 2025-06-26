@@ -4,24 +4,24 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Herramientas {
-    id_herramienta: number;
-    nombre_h: string;
-    fecha_prestamo: string;
+    id: number;
+    nombre: string;
+    cantidad: string;
+    precio: number;
     estado: string;
 }
 
 const fetchHerramientas = async (): Promise<Herramientas[]> => {
     try {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-            throw new Error('No se encontró el token de autenticación');
-        }
+        //const token = localStorage.getItem('token');
+        //if (!token) {
+        //    throw new Error('No se encontró el token de autenticación');
+        //}
 
         const { data } = await axios.get(`${apiUrl}herramientas/`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            //headers: {
+            //    Authorization: `Bearer ${token}`,
+            //},
         });
         return data;
     } catch (error) {

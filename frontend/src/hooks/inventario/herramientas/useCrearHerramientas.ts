@@ -4,9 +4,10 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Herramientas {
-    nombre_h: string;
-    fecha_prestamo: string | null;
+    nombre: string;
+    cantidad: string | number;
     estado: string;
+    precio: string | number;
 }
 
 export const useCrearHerramientas = () => {
@@ -14,19 +15,19 @@ export const useCrearHerramientas = () => {
 
     return useMutation({
         mutationFn: async (nuevoHerramienta: Herramientas) => {
-            const token = localStorage.getItem("token");
-            console.log(token);
-            console.log(nuevoHerramienta)
-            if (!token) {
-                throw new Error("No se ha encontrado un token de autenticación");
-            }
+            //const token = localStorage.getItem("token");
+            //console.log(token);
+            //console.log(nuevoHerramienta)
+            //if (!token) {
+            //    throw new Error("No se ha encontrado un token de autenticación");
+            //}
             const data  = await axios.post(
                 `${apiUrl}herramientas/`,
                 nuevoHerramienta,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    //headers: {
+                    //    Authorization: `Bearer ${token}`,
+                    //},
                 }
             );
             return data;

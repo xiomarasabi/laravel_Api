@@ -4,26 +4,18 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Insumo {
-    id_insumo: number;
+    id: number;
     nombre: string;
     tipo: string;
     precio_unidad: number;
     cantidad: number;
+    fecha_vencimiento: string | Date;
     unidad_medida: string;
 }
 
 const actualizarInsumo = async (insumo: Insumo) => {
     try {
-        const token = localStorage.getItem("token"); // Ejemplo: obtener token de localStorage
-        if (!token) {
-            throw new Error("No se encontró un token de autenticación");
-        }
-
-        const { data } = await axios.put(`${apiUrl}insumo/${insumo.id_insumo}`, insumo, {
-            headers: {
-                Authorization: `Bearer ${token}`, // Agregar token en el encabezado
-            },
-        });
+        const { data } = await axios.put(`${apiUrl}insumos/${insumo.id}`, insumo);
         return data;
     } catch (error) {
         console.error("Error al actualizar el insumo:", error);

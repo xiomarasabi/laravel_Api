@@ -38,7 +38,7 @@ const Insumos = () => {
     setIsModalOpen(false);
   };
 
-  const headers = ["id", "Nombre", "Tipo", "Precio Unidad", "Cantidad", "Unidad Medida"];
+  const headers = ["id", "Nombre", "Tipo", "Precio Unidad", "Cantidad",'fecha_vencimiento', "Unidad Medida"];
 
   const handleRowClick = (insumo: Insumo) => {
     openModalHandler(insumo);
@@ -68,7 +68,7 @@ const Insumos = () => {
       ]);
 
       autoTable(doc,{
-        head: [['ID', 'Nombre', 'Tipo', 'Precio Unidad', 'Cantidad', 'Unidad Medida']],
+        head: [['ID', 'Nombre', 'Tipo', 'Precio Unidad', 'Cantidad','Unidad Medida']],
         body: tableData,
         startY: 20,
       });
@@ -87,11 +87,12 @@ const Insumos = () => {
 
   const mappedInsumo = Array.isArray(InsumoList)
     ? InsumoList.map(insumo => ({
-        id: insumo.id_insumo,
+        id: insumo.id,
         nombre: insumo.nombre,
         tipo: insumo.tipo,
         precio_unidad: insumo.precio_unidad,
         cantidad: insumo.cantidad,
+        fecha_vencimiento: insumo.fecha_vencimiento,
         unidad_medida: insumo.unidad_medida,
       }))
     : [];
