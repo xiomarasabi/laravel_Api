@@ -1,87 +1,96 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
 
-// Interfaces para los tipos de datos
-export interface Residuos {
-    id_residuo: number;
-    nombre: string;
-    fecha: string;
-    descripcion: string;
-    fk_id_cultivo: Cultivos;
-    fk_id_tipo_residuo: TipoResiduos;
+export interface Residuo {
+  id: number;
+  nombre: string;
+  fecha: string;
+  descripcion: string;
+  fk_id_tipo_residuo: number;
+  fk_id_cultivo: number;
+  tipo_residuo: TipoResiduo;
+  cultivo: Cultivo;
 }
 
-export interface Cultivos {
-    id_cultivo: number;
-    nombre_cultivo: string;
-    fecha_plantacion: string;
-    descripcion: string;
-    fk_id_especie: Especie;
-    fk_id_semillero: Semillero;
+export interface Cultivo {
+  id: number;
+  nombre_cultivo: string;
+  fecha_plantacion: string;
+  descripcion: string;
 }
 
-export interface Semillero {
-    id_semillero: number;
-    nombre_semilla: string;
-    fecha_siembra: string;
-    fecha_estimada: string;
-    cantidad: number;
+export interface TipoResiduo {
+  id: number;
+  nombre_residuo: string; // Cambiado de 'nombre' a 'nombre_residuo'
 }
 
-export interface TipoCultivo {
-    id_tipo_cultivo: number;
-    nombre: string;
-    descripcion: string;
-}
+const fetchResiduos = async (): Promise<Residuo[]> => {
+  const token = localStorage.getItem('token');
+  console.log('API URL:', apiUrl);
+  console.log('Full URL:', `${apiUrl}/residuos`);
 
-export interface Especie {
-    id_especie: number;
-    nombre_comun: string;
-    nombre_cientifico: string;
-    descripcion: string;
-    fk_id_tipo_cultivo: TipoCultivo;
-}
+  if (!token) {
+    throw new Error('No hay token disponible. Por favor, inicia sesión.');
+  }
 
-export interface TipoResiduos {
-    id_tipo_residuo: number;
-    nombre_residuo: string;
-    descripcion: string;
-}
+  try {
+    const { data } = await axios.get(`${apiUrl}/residuos`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-// Función para obtener residuos con token
-const fetchResiduos = async (): Promise<Residuos[]> => {
-    const token = localStorage.getItem('token');
-    console.log('API URL:', apiUrl); // Depuración
-    console.log('Full URL:', `${apiUrl}/residuos`); // Depuración
-
-    if (!token) {
-        throw new Error('No hay token disponible. Por favor, inicia sesión.');
+    if (!data || !Array.isArray(data)) {
+      console.error('Formato de datos inesperado:', data);
+      throw new Error('Los datos de residuos no tienen el formato esperado.');
     }
 
-    try {
-        const response = await axios.get(`${apiUrl}residuos`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+    const mappedData = data.map((residuo: any) => {
+      console.log('Datos del residuo:', residuo); // Depuración adicional
+      return {
+        id: residuo.id,
+        nombre: residuo.nombre,
+        fecha: residuo.fecha,
+        descripcion: residuo.descripcion,
+        fk_id_tipo_residuo: residuo.fk_id_tipo_residuo,
+        fk_id_cultivo: residuo.fk_id_cultivo,
+        tipo_residuo: {
+          id: residuo.tipo_residuo?.id,
+          nombre_residuo: residuo.tipo_residuo?.nombre_residuo || 'Sin nombre', // Cambiado de 'nombre' a 'nombre_residuo'
+        },
+        cultivo: {
+          id: residuo.cultivo?.id,
+          nombre_cultivo: residuo.cultivo?.nombre_cultivo,
+          fecha_plantacion: residuo.cultivo?.fecha_plantacion,
+          descripcion: residuo.cultivo?.descripcion,
+        },
+      };
+    });
 
-        console.log('Respuesta de la API:', response.data);
-        return response.data.residuos || [];
-    } catch (error) {
-        console.error('Error al obtener residuos:', error);
-        throw new Error('No se pudo obtener la lista de residuos');
+    console.log('Datos mapeados de residuos:', mappedData);
+    return mappedData;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message = error.response?.data?.message || error.message;
+      console.error('Error al obtener residuos:', {
+        status: error.response?.status,
+        message,
+      });
+      throw new Error(`No se pudo obtener la lista de residuos: ${message}`);
     }
+    console.error('Error desconocido:', error);
+    throw new Error('Error desconocido al obtener residuos');
+  }
 };
 
-// Hook de React Query
 export const useResiduos = () => {
-    return useQuery<Residuos[], Error>({
-        queryKey: ['residuos'],
-        queryFn: fetchResiduos,
-        gcTime: 1000 * 60 * 10,
-        retry: 2,
-        staleTime: 1000 * 60 * 5,
-    });
+  return useQuery<Residuo[], Error>({
+    queryKey: ['Residuos'],
+    queryFn: fetchResiduos,
+    gcTime: 1000 * 60 * 10,
+    retry: 2,
+    staleTime: 1000 * 60 * 5,
+  });
 };

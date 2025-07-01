@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useActualizarPea, ActualizarPeaInput } from '../../../hooks/trazabilidad/pea/useActualizarPea';
+import { useActualizarPea, ActualizarPeaInput } from '@/hooks/trazabilidad/pea/useActualizarPea';
+import { usePeaPorId } from '@/hooks/trazabilidad/pea/usePeaPorId';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePeaPorId } from '../../../hooks/trazabilidad/pea/usePeaPorId';
-import Formulario from '../../globales/Formulario';
+import Formulario from '@/components/globales/Formulario';
 
 const ActualizarPea = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,12 +15,12 @@ const ActualizarPea = () => {
     descripcion: '',
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Verificar token al montar el componente
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('🔐 No hay token al montar ActualizarPea, redirigiendo al login');
+      console.log('🔐 No hay token, redirigiendo al login');
       navigate('/login');
     }
   }, [navigate]);
@@ -36,13 +36,6 @@ const ActualizarPea = () => {
     }
   }, [pea]);
 
-  useEffect(() => {
-    if (error && (error.message.includes('No hay token') || error.message.includes('Sesión inválida'))) {
-      console.log('🔐 Redirigiendo al login por error de autenticación');
-      navigate('/login');
-    }
-  }, [error, navigate]);
-
   if (!id || isNaN(peaId)) {
     console.log('❌ ID inválido:', id);
     return <div className="text-center text-red-500 py-4">ID de PEA inválido</div>;
@@ -55,6 +48,9 @@ const ActualizarPea = () => {
 
   if (error) {
     console.log('❌ Error al cargar PEA:', error.message);
+    if (error.message.includes('Sesión inválida')) {
+      navigate('/login');
+    }
     return <div className="text-center text-red-500 py-4">Error al cargar el PEA: {error.message}</div>;
   }
 
@@ -63,38 +59,38 @@ const ActualizarPea = () => {
     return <div className="text-center text-red-500 py-4">PEA no encontrado</div>;
   }
 
-  const handleSubmit = async (data: { [key: string]: string }) => {
+  const handleSubmit = (data: { [key: string]: string }) => {
     setErrorMessage(null);
+    setSuccessMessage(null);
 
-    if (!data.nombre || !data.descripcion) {
-      setErrorMessage('Nombre y descripción son obligatorios.');
-      console.log('❌ Validación fallida: campos vacíos');
+    if (!data.nombre) {
+      setErrorMessage('El nombre es obligatorio');
+      console.log('❌ Validación fallida: nombre vacío');
       return;
     }
 
     const peaActualizada: ActualizarPeaInput = {
-      nombre: data.nombre,
-      descripcion: data.descripcion,
+      nombre: data.nombre.trim(),
+      descripcion: data.descripcion.trim() || null,
     };
 
     console.log('🚀 Enviando al hook:', { id_pea: peaId, ...peaActualizada });
 
     mutation.mutate({ id_pea: peaId, ...peaActualizada }, {
       onSuccess: () => {
-        console.log('✅ PEA actualizada correctamente, navegando a /pea');
-        navigate('/pea');
+        setSuccessMessage('PEA actualizado exitosamente');
+        setTimeout(() => navigate('/pea', { replace: true }), 2000);
       },
-      onError: (error: any) => {
-        const message = error.message.includes('No hay token') || error.message.includes('Sesión inválida')
-          ? 'Sesión inválida. Redirigiendo al login...'
-          : error.response?.data?.message || 'Error al actualizar el PEA. Inténtalo de nuevo.';
+      onError: (error: Error) => {
+        const message = error.message.includes('Sesión inválida') ? 'Sesión inválida. Redirigiendo al login...' : error.message;
         setErrorMessage(message);
         console.error('❌ Error al actualizar PEA:', error);
+        if (error.message.includes('Sesión inválida')) {
+          setTimeout(() => navigate('/login'), 2000);
+        }
       },
     });
   };
-
-  console.log('📋 formData actual:', formData);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -108,15 +104,15 @@ const ActualizarPea = () => {
           Actualizando PEA...
         </div>
       )}
-      {mutation.isSuccess && (
+      {successMessage && (
         <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-          PEA actualizado exitosamente.
+          {successMessage}
         </div>
       )}
       <Formulario
         fields={[
           { id: 'nombre', label: 'Nombre del PEA', type: 'text' },
-          { id: 'descripcion', label: 'Descripción', type: 'text' },
+          { id: 'descripcion', label: 'Descripción', type: 'textarea' },
         ]}
         onSubmit={handleSubmit}
         isError={mutation.isError}
