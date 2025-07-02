@@ -6,9 +6,9 @@ const apiUrl = import.meta.env.VITE_API_URL;
 export interface NuevaVenta {
   fk_id_produccion: number;
   cantidad: number;
-  precio_unidad: number;
+  precio_unitario: number;
   total_venta: number;
-  fecha: string;
+  fecha_venta: string;
 }
 
 export const useCrearVenta = () => {
@@ -22,7 +22,7 @@ export const useCrearVenta = () => {
       }
 
       const { data } = await axios.post(
-        `${apiUrl}venta/`, 
+        `${apiUrl}ventas/`,
         nuevaVenta,
         {
           headers: {

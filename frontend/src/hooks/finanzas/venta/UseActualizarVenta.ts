@@ -4,7 +4,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Venta {
-  id_venta: number;
+  id: number;
   fk_id_produccion: number | null;
   cantidad: number;
   precio_unitario: number;
@@ -21,14 +21,14 @@ export const useActualizarVenta = () => {
         throw new Error("No se ha encontrado un token de autenticación");
       }
 
-      const { id_venta, ...datos } = ventaActualizada;
+      const { id, ...datos } = ventaActualizada;
 
       const { data } = await axios.put(
-        `${apiUrl}venta/${id_venta}/`,
+        `${apiUrl}ventas/${id}`,
         datos,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            //Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -39,7 +39,7 @@ export const useActualizarVenta = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["ventas"] }); // Lista general
-      queryClient.invalidateQueries({ queryKey: ["venta", variables.id_venta] }); // Detalle individual
+      queryClient.invalidateQueries({ queryKey: ["venta", variables.id] }); // Detalle individual
     },
     onError: (error: any) => {
       console.error("❌ Error al actualizar la venta:", error?.response?.data || error.message);

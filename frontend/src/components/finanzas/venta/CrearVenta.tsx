@@ -1,23 +1,22 @@
-import { NuevaVenta } from '@/hooks/finanzas/venta/useCrearVenta';
-import { useCrearVenta } from '../../../hooks/finanzas/venta/useCrearVenta';
+import { useCrearVenta, NuevaVenta } from '@/hooks/finanzas/venta/useCrearVenta';
 import Formulario from '../../globales/Formulario';
 import { useNavigate } from 'react-router-dom';
-import { useProduccion } from '@/hooks/finanzas/produccion/useProduccion'; // Usamos producciones, no cultivos
+import { useProduccion } from '@/hooks/finanzas/produccion/useProduccion';
 
 const CrearVenta = () => {
   const mutation = useCrearVenta();
   const navigate = useNavigate();
-  const { data: producciones = [] } = useProduccion(); // Obtener producciones
+  const { data: producciones = [] } = useProduccion();
 
-  const formFields = [
+  const formFields = [  
     {
       id: 'fk_id_produccion',
       label: 'Producción',
       type: 'select',
-      options: producciones.map(produccion => ({
-        value: String(produccion.id_produccion),
-        label: `${produccion.nombre_produccion} - ${new Date(produccion.fecha_produccion).toLocaleDateString()}`
-      }))
+      options: producciones.map((produccion) => ({
+        value: String(produccion.id),
+        label: `${produccion.nombre_produccion} - ${new Date(produccion.fecha_produccion).toLocaleDateString()}`,
+      })),
     },
     { id: 'cantidad', label: 'Cantidad', type: 'number' },
     { id: 'precio_unidad', label: 'Precio por Unidad', type: 'number' },
@@ -25,25 +24,40 @@ const CrearVenta = () => {
   ];
 
   const handleSubmit = (formData: { [key: string]: string }) => {
-    const cantidad = parseFloat(formData.cantidad);
-    const precio_unidad = parseFloat(formData.precio_unidad);
-    const fk_id_produccion = parseInt(formData.fk_id_produccion);
+    console.log("Detalles del formulario: ", formData);
 
-    const nuevaVenta = {
+    const rawProduccion = formData.fk_id_produccion;
+
+    if (!rawProduccion || rawProduccion === 'undefined') {
+      console.error("❌ Producción no seleccionada");
+      return;
+    }
+
+    const fk_id_produccion = parseInt(rawProduccion);
+    const cantidad = parseFloat(formData.cantidad);
+    const precio_unitario = parseFloat(formData.precio_unidad);
+    const fecha_venta = formData.fecha;
+
+    if (isNaN(fk_id_produccion) || isNaN(cantidad) || isNaN(precio_unitario)) {
+      console.error("❌ Datos numéricos inválidos");
+      return;
+    }
+
+    const nuevaVenta: NuevaVenta = {
       fk_id_produccion,
       cantidad,
-      precio_unitario: precio_unidad, // Renombrado aquí
-      total_venta: cantidad * precio_unidad,
-      fecha_venta: formData.fecha, // Renombrado aquí
+      precio_unitario,
+      total_venta: cantidad * precio_unitario,
+      fecha_venta,
     };
+
+    console.log("✅ Venta enviada:", nuevaVenta);
 
     mutation.mutate(nuevaVenta, {
       onSuccess: () => {
         navigate("/ventas");
       },
     });
-
-    console.log("✅ Venta enviada:", nuevaVenta);
   };
 
   return (
@@ -54,6 +68,7 @@ const CrearVenta = () => {
         isError={mutation.isError}
         isSuccess={mutation.isSuccess}
         title="Crear Venta"
+        initialValues={{ fk_id_produccion: '' }} // Prevenir 'undefined'
       />
     </div>
   );

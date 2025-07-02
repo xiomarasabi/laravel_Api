@@ -6,8 +6,8 @@ import { useProduccion } from "@/hooks/finanzas/produccion/useProduccion";
 import Formulario from "../../globales/Formulario";
 
 const ActualizarVenta = () => {
-  const { id_venta } = useParams();
-  const { data: venta, isLoading, error } = useVentaId(id_venta);
+  const { id } = useParams();
+  const { data: venta, isLoading, error } = useVentaId(id);
   const { data: producciones = [] } = useProduccion();
   const actualizarVenta = useActualizarVenta();
   const navigate = useNavigate();
@@ -20,12 +20,10 @@ const ActualizarVenta = () => {
   });
 
   useEffect(() => {
-    console.log("Producciones:", producciones); // Depuración
-    console.log("Venta:", venta); // Depuración
     if (venta) {
       setFormData({
-        fk_id_produccion: venta.fk_id_produccion?.id_produccion
-          ? String(venta.fk_id_produccion.id_produccion)
+        fk_id_produccion: venta.fk_id_produccion?.id
+          ? String(venta.fk_id_produccion.id)
           : "",
         cantidad: venta.cantidad?.toString() || "",
         precio_unitario: venta.precio_unitario?.toString() || "",
@@ -35,10 +33,15 @@ const ActualizarVenta = () => {
   }, [venta, producciones]);
 
   const handleSubmit = (data: { [key: string]: string }) => {
-    if (!id_venta) return;
+    console.log("📩 handleSubmit ejecutado con:", data); // DEPURACIÓN PRINCIPAL
+
+    if (!id) {
+      console.error("❌ ID no disponible");
+      return;
+    }
 
     const ventaActualizada = {
-      id_venta: parseInt(id_venta),
+      id: parseInt(id),
       fk_id_produccion: parseInt(data.fk_id_produccion) || null,
       cantidad: parseFloat(data.cantidad),
       precio_unitario: parseFloat(data.precio_unitario),
@@ -46,11 +49,18 @@ const ActualizarVenta = () => {
       fecha_venta: data.fecha,
     };
 
+    console.log("📦 Enviando ventaActualizada:", ventaActualizada);
+
     actualizarVenta.mutate(ventaActualizada, {
-      onSuccess: () => setTimeout(() => navigate("/ventas"), 500),
-      onError: (error) => console.error("❌ Error al actualizar venta:", error),
+      onSuccess: () => {
+        console.log("✅ Venta actualizada con éxito");
+        setTimeout(() => navigate("/ventas"), 500);
+      },
+      onError: (error) =>
+        console.error("❌ Error al actualizar venta:", error),
     });
   };
+
 
   if (isLoading) return <div className="text-gray-500">Cargando datos...</div>;
   if (error) return <div className="text-red-500">Error al cargar la venta: {error.message}</div>;
@@ -63,10 +73,10 @@ const ActualizarVenta = () => {
       type: "select",
       options: producciones.map((prod) => {
         const option = {
-          value: String(prod.id_produccion), // Asegura que sea string
+          value: String(prod.id), // Asegura que sea string
           label: prod.fk_id_cultivo?.nombre_cultivo
             ? `${prod.fk_id_cultivo.nombre_cultivo} - ${new Date(prod.fecha_produccion).toLocaleDateString()}`
-            : `Producción ID ${prod.id_produccion} (sin cultivo)`,
+            : `Producción ID ${prod.id} (sin cultivo)`,
         };
         console.log("Opción generada:", option); // Depuración
         return option;

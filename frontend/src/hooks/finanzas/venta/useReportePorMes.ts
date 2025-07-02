@@ -8,7 +8,7 @@ const useReporteMensualPDF = () => {
   const generarPDF = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get(`${apiUrl}venta/reporte_mes`, {
+      const { data } = await axios.get(`${apiUrl}ventas/reporte_mes`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -4,7 +4,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Produccion {
-  id_produccion: number;
+  id: number;
   nombre_produccion: string;
   fk_id_cultivo: number | null;
   cantidad_producida: number;
@@ -20,7 +20,7 @@ export const useActualizarProduccion = () => {
 
   return useMutation({
     mutationFn: async (produccionActualizada: Produccion) => {
-      const { id_produccion, ...datos } = produccionActualizada;
+      const { id, ...datos } = produccionActualizada;
 
       try {
         const token = localStorage.getItem("token");
@@ -29,7 +29,7 @@ export const useActualizarProduccion = () => {
         }
 
         const { data } = await axios.put(
-          `${apiUrl}produccion/${id_produccion}`,
+          `${apiUrl}produccion/${id}`,
           datos,
           {
             headers: {
@@ -48,7 +48,7 @@ export const useActualizarProduccion = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["produccion"] });
-      queryClient.invalidateQueries({ queryKey: ["produccion", variables.id_produccion] });
+      queryClient.invalidateQueries({ queryKey: ["produccion", variables.id] });
     },
     onError: (error: any) => {
       console.error("❌ Error en la mutación de actualización:", error.message);

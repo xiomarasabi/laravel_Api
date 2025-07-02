@@ -25,8 +25,17 @@ use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProgramacionController;
 use App\Http\Controllers\RealizaController;
 
+Route::prefix('produccion')->group(function () {
+    Route::get('reporte', [ProduccionController::class, 'getReporteProduccion']);
+});
 Route::apiResource('produccion', ProduccionController::class);
+
+Route::prefix('ventas')->group(function () {
+    Route::get('reporte_ventas', [VentaController::class, 'getReporteVentas']);
+    Route::get('reporte_mes', [VentaController::class, 'getReporteVentasPorMes']);
+});
 Route::apiResource('ventas', VentaController::class);
+
 Route::apiResource('insumos', InsumoController::class);
 Route::apiResource('herramientas', HerramientaController::class);
 
