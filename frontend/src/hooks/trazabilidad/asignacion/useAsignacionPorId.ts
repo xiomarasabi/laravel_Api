@@ -11,7 +11,7 @@ export const useAsignacionporId = (id: string | undefined) => {
         console.error("❌ Error: ID no proporcionado");
         throw new Error("ID no proporcionado");
       }
-      const { data } = await axios.get(`${apiUrl}asignacion_actividad/${id}`, {
+      const { data } = await axios.get(`${apiUrl}asignacion_actividades/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") || ""}`, // Añadir token si es necesario
         },

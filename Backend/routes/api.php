@@ -43,11 +43,5 @@ Route::apiResource('residuos', ResiduoController::class);
 Route::apiResource('peas', PeaController::class);
 Route::apiResource('desarrollan', DesarrollanController::class);
 Route::apiResource('control_fitosanitario', ControlFitosanitarioController::class);
-
-
 Route::apiResource('actividad', ActividadController::class);
-Route::apiResource('asignacion_actividades', AsignacionActividadesController::class);
 Route::apiResource('calendario_lunar', CalendarioLunarController::class);
-Route::apiResource('notificacion', NotificacionController::class);
-Route::apiResource('programacion', ProgramacionController::class);
-Route::apiResource('realiza', RealizaController::class);

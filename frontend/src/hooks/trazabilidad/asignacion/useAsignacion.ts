@@ -33,15 +33,15 @@ export interface Rol {
 
 // Función para obtener asignaciones
 const fetchAsignaciones = async (): Promise<Asignacion[]> => {
-  const token = localStorage.getItem('token');
+  //const token = localStorage.getItem('token');
 
-  if (!token) {
-    throw new Error('No hay token de autenticación');
-  }
+  //if (!token) {
+   // throw new Error('No hay token de autenticación');
+ // }
 
   try {
-    const response = await axios.get(`${apiUrl}asignacion_actividad/`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.get(`${apiUrl}asignacion_actividades/`, {
+      //headers: { Authorization: `Bearer ${token}` },
     });
 
     // Validamos que los datos devueltos sean un array

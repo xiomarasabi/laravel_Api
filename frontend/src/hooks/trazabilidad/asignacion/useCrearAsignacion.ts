@@ -20,7 +20,7 @@ export const useCrearAsignacion = () => {
       console.log("🚀 Datos enviados al backend para crear asignación:", nuevaAsignacion);
 
       try {
-        const { data } = await axios.post(`${apiUrl}/asignacion_actividad`, nuevaAsignacion, {
+        const { data } = await axios.post(`${apiUrl}/asignacion_actividades`, nuevaAsignacion, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
