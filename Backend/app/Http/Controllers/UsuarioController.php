@@ -25,17 +25,7 @@ class UsuarioController extends Controller
             'email' => 'required|email|unique:usuarios,email',
             'fk_id_rol' => $hayUsuarios ? 'required|exists:rols,id' : 'nullable',
         ]);
-
-        if (!$hayUsuarios) {
-            // Crea el rol "Administrador" si no existe
-            $rolAdmin = Rol::firstOrCreate(
-                ['nombre_rol' => 'Administrador'],
-                ['fecha_creacion' => now()]
-            );
-            // Asigna automáticamente el rol de administrador al primer usuario
-            $request->merge(['fk_id_rol' => $rolAdmin->id]);
-        }
-
+        
         $usuario = Usuario::create($request->all());
         $usuario->load('rol');
 

@@ -24,7 +24,7 @@ use App\Http\Controllers\AuthController;
 
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::apiResource('usuario', UsuarioController::class)->only(['store']);
+
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('me', [AuthController::class, 'me']);
@@ -32,6 +32,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('refresh', [AuthController::class, 'refresh']);
 
     // Recursos protegidos
+    Route::apiResource('usuario', UsuarioController::class);
     Route::apiResource('rol', RolController::class);
     Route::apiResource('produccion', ProduccionController::class);
     Route::apiResource('ventas', VentaController::class);
