@@ -9,23 +9,20 @@ export const useProduccionId = (id_produccion: string | undefined) => {
     queryFn: async () => {
       if (!id_produccion) throw new Error("ID no proporcionado");
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token no encontrado");
-      }
-
       try {
         const { data } = await axios.get(`${apiUrl}produccion/${id_produccion}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        console.log("🌱 Datos obtenidos del backend:", data.produccion); // Depuración específica
-        if (!data.produccion) {
+
+        console.log("🌱 Datos obtenidos del backend:", data); // ✅ corregido
+
+        if (!data) {
           throw new Error("No se encontró la producción en la respuesta");
         }
-        return data.produccion;
+
+        return data;
       } catch (error: any) {
         console.error("❌ Error en la solicitud:", error.response?.data || error.message);
         throw error;

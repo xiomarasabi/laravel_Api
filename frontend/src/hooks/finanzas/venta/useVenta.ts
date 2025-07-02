@@ -38,19 +38,22 @@ export interface Lote {
 }
 
 export interface Produccion {
-  id_produccion: number;
-  fk_id_cultivo: Cultivo;
+  id: number;
+  fk_id_cultivo: number;
   cantidad_producida: number;
   fecha_produccion: string;
-  fk_id_lote: Lote;
+  fk_id_lote: number;
+  lote: Lote;
+  cultivo: Cultivo;
 }
 
 export interface Venta {
-  id_venta: number;
-  fk_id_produccion: Produccion;
+  id: number;
+  fk_id_produccion: number;
   cantidad: number;
   precio_unitario: number;
   fecha_venta: string;
+  produccion?: Produccion; 
 }
 
 
@@ -58,13 +61,13 @@ const fetchVentas = async (): Promise<Venta[]> => {
   try {
     const token = localStorage.getItem("token");
 
-    const { data } = await axios.get(`${apiUrl}venta/`, {
+    const { data } = await axios.get(`${apiUrl}ventas/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    return data.ventas; // ← ✅ Aquí extraes solo el array
+    return data;
   } catch (error) {
     console.error("Error al obtener los datos de venta:", error);
     throw new Error("No se pudo obtener la lista de ventas");

@@ -19,7 +19,7 @@ const VentaComponent = () => {
     setIsModalOpen(true);
   };
 
-  const handleRowClick = (venta: { id_venta: number }) => {
+  const handleRowClick = (venta: { id: number }) => {
     openModalHandler(venta);
   };
 
@@ -28,8 +28,8 @@ const VentaComponent = () => {
     setIsModalOpen(false);
   };
 
-  const handleUpdate = (cultivo: { id_venta: number }) => {
-    navigate(`/actualizarventa/${cultivo.id_venta}`);
+  const handleUpdate = (cultivo: { id: number }) => {
+    navigate(`/actualizarventa/${cultivo.id}`);
   };
 
   const handleCreate = () => {
@@ -44,26 +44,28 @@ const VentaComponent = () => {
   if (error) return <div className="text-center text-red-500">Error al cargar los datos: {error.message}</div>;
 
   const ventasList = Array.isArray(ventas) ? ventas : [];
+  console.log ('ventas array', ventasList)
+
   const mappedVentas = ventasList.map((venta) => ({
-    id_venta: venta.id_venta,
+    id: venta.id,
     cantidad: venta.cantidad,
     precio_unitario: venta.precio_unitario,
     total_venta: venta.cantidad * venta.precio_unitario,
     fecha_venta: new Date(venta.fecha_venta).toLocaleDateString(),
-    cantidad_producción: venta.fk_id_produccion?.cantidad_producida ?? "No disponible",
-    fecha_producción: venta.fk_id_produccion?.fecha_produccion
-      ? new Date(venta.fk_id_produccion.fecha_produccion).toLocaleDateString()
+    cantidad_producida: venta.produccion?.cantidad_producida ?? "No disponible",
+    fecha_produccion: venta.produccion?.fecha_produccion
+      ? new Date(venta.produccion.fecha_produccion).toLocaleDateString()
       : "No disponible",
   }));
 
   const headers = [
-    "ID Venta",
+    "ID",
     "Cantidad",
     "Precio Unitario",
     "Total Venta",
     "Fecha Venta",
-    "Cantidad Producción",
-    "Fecha Producción"
+    "Cantidad Producida",
+    "Fecha Produccion"
   ];
 
   return (

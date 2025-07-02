@@ -24,10 +24,10 @@ const GraficasVentas: React.FC = () => {
     const fetchData = async () => {
       try {
         const [resProduccion, resMensual] = await Promise.all([
-          axios.get(`${apiUrl}venta/reporte_ventas`, {
+          axios.get(`${apiUrl}ventas/reporte_ventas`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${apiUrl}venta/reporte_mes`, {
+          axios.get(`${apiUrl}ventas/reporte_mes`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

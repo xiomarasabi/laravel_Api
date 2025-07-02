@@ -27,7 +27,7 @@ const ProduccionComponent = () => {
     setIsModalOpen(true);
   };
 
-  const handleRowClick = (produccion: { id_produccion: number }) => {
+  const handleRowClick = (produccion: { id: number }) => {
     openModalHandler(produccion);
   };
 
@@ -36,8 +36,8 @@ const ProduccionComponent = () => {
     setIsModalOpen(false);
   };
 
-  const handleUpdate = (cultivo: { id_produccion: number }) => {
-    navigate(`/actualizarproduccion/${cultivo.id_produccion}`);
+  const handleUpdate = (cultivo: { id: number }) => {
+    navigate(`/actualizarproduccion/${cultivo.id}`);
   };
 
   const handleCreate = () => {
@@ -54,7 +54,7 @@ const ProduccionComponent = () => {
   // Mapeo de los datos para la tabla
   const produccionList = Array.isArray(producciones) ? producciones : [];
   const mappedProducciones = produccionList.map((produccion) => ({
-    id_produccion: produccion.id_produccion,
+    id: produccion.id,
     nombre_produccion: produccion.nombre_produccion,
     cantidad_producida: produccion.cantidad_producida ?? null,
     fecha_producción: produccion.fecha_produccion
@@ -66,7 +66,7 @@ const ProduccionComponent = () => {
       : "No disponible"
   }));
 
-  const headers = ["ID Produccion", "Cantidad Producida", "Fecha Producción", "Nombre Cultivo", "Fecha Plantación"];
+  const headers = ["ID", "Cantidad Producida", "Fecha Producción", "Nombre Cultivo", "Fecha Plantación"];
 
   return (
     <div className="mx-auto p-4">
