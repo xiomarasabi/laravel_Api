@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id(); // id autoincremental
             $table->decimal('cantidad_producida', 10, 2);
             $table->string('nombre_produccion', 50);
-            $table->date('fecha_produccion');
+            $table->date('fecha_p   roduccion');
             $table->unsignedBigInteger('fk_id_lote');
             $table->unsignedBigInteger('fk_id_cultivo');
             $table->text('descripcion_produccion')->nullable();
