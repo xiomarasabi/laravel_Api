@@ -59,7 +59,16 @@ class CalendarioLunarController extends Controller
 
     public function destroy($id)
     {
-       }};    $calendario = CalendarioLunar::findOrFail($id);
-        $calendario->delete();
+        try {
+            $calendario = CalendarioLunar::findOrFail($id);
+            $calendario->delete();
 
-        return response()->json(['msg' => 'Evento lunar eliminado correctamente']);
+            return response()->json(['msg' => 'Evento lunar eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'msg' => 'Error al eliminar el evento lunar',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+}
