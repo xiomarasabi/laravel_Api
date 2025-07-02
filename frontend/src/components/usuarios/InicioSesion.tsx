@@ -17,12 +17,12 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useCustomForm(loginSchema, {
-    login: "",
+    identificacion: "",
     password: "",
   });
 
   const onSubmit = async (data: LoginData) => {
-    const result = await login(data.login, data.password);
+    const result = await login(data.identificacion, data.password);
     console.log("a ver que aparece",result);
     if (result.success) {
       navigate("/principal");
@@ -45,11 +45,11 @@ export default function Login() {
               <input
                 type="text"
                 placeholder="Identificación"
-                {...register("login")}
+                {...register("identificacion")}
                 className="w-full px-4 py-2 border rounded-md"
               />
-              {errors.login && (
-                <p className="text-red-500 text-sm">{errors.login.message}</p>
+              {errors.identificacion && (
+                <p className="text-red-500 text-sm">{errors.identificacion.message}</p>
               )}
             </div>
             <div className="relative">
