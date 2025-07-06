@@ -21,8 +21,8 @@ class ProduccionController extends Controller
             'cantidad_producida' => 'required|numeric|min:0',
             'nombre_produccion' => 'required|string|max:50',
             'fecha_produccion' => 'required|date',
-            'fk_id_lote' => 'required|exists:lote,id',
-            'fk_id_cultivo' => 'required|exists:cultivo,id',
+            'fk_id_lote' => 'required|exists:lotes,id',       // ✅ corregido
+            'fk_id_cultivo' => 'required|exists:cultivos,id', // ✅ corregido
             'descripcion_produccion' => 'nullable|string',
             'estado' => 'required|string|max:20',
             'fecha_cosecha' => 'nullable|date|after_or_equal:fecha_produccion',
@@ -50,8 +50,8 @@ class ProduccionController extends Controller
             'cantidad_producida' => 'numeric|min:0',
             'nombre_produccion' => 'string|max:50',
             'fecha_produccion' => 'date',
-            'fk_id_lote' => 'exists:lote,id',
-            'fk_id_cultivo' => 'exists:cultivo,id',
+            'fk_id_lote' => 'exists:lotes,id',       // ✅ corregido
+            'fk_id_cultivo' => 'exists:cultivos,id', // ✅ corregido
             'descripcion_produccion' => 'nullable|string',
             'estado' => 'string|max:20',
             'fecha_cosecha' => 'nullable|date|after_or_equal:fecha_produccion',

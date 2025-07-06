@@ -1,17 +1,14 @@
-import { Produccion } from '@/hooks/finanzas/produccion/useCrearProduccion';
-import { useCrearProduccion } from '../../../hooks/finanzas/produccion/useCrearProduccion';
-import Formulario from '../../globales/Formulario';
 import { useNavigate } from 'react-router-dom';
-import { useCultivo } from '../../../hooks/trazabilidad/cultivo/useCultivo';
-import { useLotes } from '../../../hooks/iot/lote/useLotes';
+import { useCrearProduccion, Produccion } from '@/hooks/finanzas/produccion/useCrearProduccion';
+import { useCultivo } from '@/hooks/trazabilidad/cultivo/useCultivo';
+import { useLotes } from '@/hooks/iot/lote/useLotes';
+import Formulario from '@/components/globales/Formulario';
 
 const CrearProduccion = () => {
-  const mutation = useCrearProduccion();
   const navigate = useNavigate();
-  const { data: cultivos = [], isLoading: isLoadingCultivos, error: errorCultivos } = useCultivo();
-  const { data: lotes = [], isLoading: isLoadingLotes, error: errorLotes } = useLotes();
-
-  console.log("📋 Lotes cargados:", lotes); // Depuración
+  const mutation = useCrearProduccion();
+  const { data: cultivos = [], isLoading: loadingCultivos, error: errorCultivos } = useCultivo();
+  const { data: lotes = [], isLoading: loadingLotes, error: errorLotes } = useLotes();
 
   const formFields = [
     {
@@ -20,14 +17,14 @@ const CrearProduccion = () => {
       type: 'select',
       options: [
         { value: '', label: 'Seleccione un cultivo' },
-        ...cultivos.map((cultivo) => ({
-          value: String(cultivo.id),
-          label: cultivo.nombre_cultivo || `Cultivo ID ${cultivo.id}`,
+        ...cultivos.map((c) => ({
+          value: String(c.id),
+          label: c.nombre_cultivo || `Cultivo ID ${c.id}`,
         })),
       ],
     },
-    { id: 'nombre_produccion', label: 'Nombre', type: 'text' },
-    { id: 'cantidad_producida', label: 'Cantidad de Producción', type: 'number' },
+    { id: 'nombre_produccion', label: 'Nombre de Producción', type: 'text' },
+    { id: 'cantidad_producida', label: 'Cantidad Producida', type: 'number' },
     { id: 'fecha_produccion', label: 'Fecha de Producción', type: 'date' },
     {
       id: 'fk_id_lote',
@@ -35,9 +32,9 @@ const CrearProduccion = () => {
       type: 'select',
       options: [
         { value: '', label: 'Seleccione un lote' },
-        ...lotes.map((lote) => ({
-          value: String(lote.id),
-          label: lote.nombre_lote || `Lote ID ${lote.id}`,
+        ...lotes.map((l) => ({
+          value: String(l.id),
+          label: l.nombre_lote || `Lote ID ${l.id}`,
         })),
       ],
     },
@@ -57,34 +54,6 @@ const CrearProduccion = () => {
   ];
 
   const handleSubmit = (formData: { [key: string]: string }) => {
-    console.log("📋 Formulario enviado:", formData); // Depuración
-
-    // Validar campos requeridos
-    if (!formData.fk_id_cultivo || formData.fk_id_cultivo === 'undefined') {
-      alert('Por favor, seleccione un cultivo válido');
-      return;
-    }
-    if (!formData.fk_id_lote || formData.fk_id_lote === 'undefined') {
-      alert('Por favor, seleccione un lote válido');
-      return;
-    }
-    if (!formData.nombre_produccion) {
-      alert('Por favor, ingrese un nombre para la producción');
-      return;
-    }
-    if (!formData.cantidad_producida || isNaN(parseFloat(formData.cantidad_producida))) {
-      alert('Por favor, ingrese una cantidad válida');
-      return;
-    }
-    if (!formData.fecha_produccion) {
-      alert('Por favor, seleccione una fecha de producción');
-      return;
-    }
-    if (!formData.estado || formData.estado === 'undefined') {
-      alert('Por favor, seleccione un estado válido');
-      return;
-    }
-
     const nuevaProduccion: Produccion = {
       fk_id_cultivo: parseInt(formData.fk_id_cultivo, 10),
       nombre_produccion: formData.nombre_produccion,
@@ -96,30 +65,29 @@ const CrearProduccion = () => {
       fecha_cosecha: formData.fecha_cosecha || null,
     };
 
-    // Validar que fk_id_lote no sea NaN
-    if (isNaN(nuevaProduccion.fk_id_lote)) {
-      alert('El ID del lote no es válido');
+    if (
+      !nuevaProduccion.fk_id_cultivo ||
+      !nuevaProduccion.nombre_produccion ||
+      isNaN(nuevaProduccion.cantidad_producida) ||
+      !nuevaProduccion.fecha_produccion ||
+      !nuevaProduccion.fk_id_lote ||
+      !nuevaProduccion.estado
+    ) {
+      alert('Por favor, complete todos los campos requeridos');
       return;
     }
 
-    console.log("🌱 Nueva producción:", nuevaProduccion); // Depuración
-
     mutation.mutate(nuevaProduccion, {
-      onSuccess: () => {
-        navigate("/produccion");
-      },
-      onError: (error: any) => {
-        console.error("❌ Error en creación de producción:", error.response?.data || error.message);
-      },
+      onSuccess: () => navigate('/produccion'),
     });
   };
 
-  if (isLoadingCultivos || isLoadingLotes) return <div className="text-gray-500">Cargando datos...</div>;
-  if (errorCultivos || errorLotes) return <div className="text-red-500">Error al cargar cultivos o lotes</div>;
-  if (!cultivos.length || !lotes.length) return <div className="text-yellow-500">No hay cultivos o lotes disponibles</div>;
+  if (loadingCultivos || loadingLotes) return <p className="text-gray-500">Cargando datos...</p>;
+  if (errorCultivos || errorLotes) return <p className="text-red-500">Error al cargar cultivos o lotes</p>;
+  if (!cultivos.length || !lotes.length) return <p className="text-yellow-500">No hay cultivos o lotes disponibles</p>;
 
   return (
-    <div className="p-10">
+    <div className="p-6">
       <Formulario
         fields={formFields}
         onSubmit={handleSubmit}

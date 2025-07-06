@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-
 export interface Ubicacion {
   id: number;
   latitud: number;
@@ -17,6 +16,7 @@ export interface Lotes {
   nombre_lote: string;
   estado: string;
 }
+
 export interface TipoCultivo {
   id: number;
   nombre: string;
@@ -50,21 +50,31 @@ export interface Cultivo {
 
 export interface Produccion {
   id: number;
-  cultivo: any;
   nombre_produccion: string;
-  fk_id_cultivo: Cultivo | null;
+  fk_id_cultivo: Number;
   cantidad_producida: number;
   fecha_produccion: string;
   fk_id_lote: number | null;
   descripcion_produccion: string;
   estado: string;
   fecha_cosecha: string;
+  cultivo:Cultivo;
+  lote:Lotes;
 }
 
-
 const fetchProduccion = async (): Promise<Produccion[]> => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No se ha encontrado un token de autenticación");
+  }
+
   try {
-    const { data } = await axios.get(`${apiUrl}produccion/`);
+    const { data } = await axios.get(`${apiUrl}produccion/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (Array.isArray(data)) {
       return data;
@@ -77,7 +87,6 @@ const fetchProduccion = async (): Promise<Produccion[]> => {
     throw new Error("No se pudo obtener la lista de producción");
   }
 };
-
 
 export const useProduccion = () => {
   return useQuery<Produccion[], Error>({
