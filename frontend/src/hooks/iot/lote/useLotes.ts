@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -17,27 +17,26 @@ export interface Lote {
   estado: string;
 }
 
-interface BackendError {
-  msg: string;
-}
+
 
 const fetchLotes = async (): Promise<Lote[]> => {
-  try {
-    const { data } = await axios.get(`${apiUrl}lotes`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-      },
-    });
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
 
-    if (data.lote && Array.isArray(data.lote)) {
-      return data.lote;
+        const { data } = await axios.get(`${apiUrl}lotes/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        console.log(data)
+        return data;
+    } catch (error) {
+        console.error("Error al obtener herramientas:", error);
+        throw new Error("No se pudo obtener la lista de las herramientas");
     }
-    throw new Error('No se pudo obtener la lista de lotes');
-  } catch (error) {
-    const err = error as AxiosError<BackendError>;
-    console.error('Error al obtener los lotes:', err, err.response);
-    throw new Error(err.response?.data?.msg || 'Error al conectar con el servidor');
-  }
 };
 
 export const useLotes = () => {

@@ -1,4 +1,3 @@
-// /src/components/iot/lotes/CrearLote.tsx
 import { useCrearLote } from '../../../hooks/iot/lote/useCrearLote';
 import { useUbicaciones, Ubicacion } from '../../../hooks/iot/ubicacion/useUbicacion';
 import Formulario from '../../globales/Formulario';
@@ -6,20 +5,17 @@ import { useNavigate } from 'react-router-dom';
 
 export interface Lote {
   id: number;
-  dimension: string; // Cambiado a string para coincidir con la respuesta del backend
+  dimension: string;
   nombre_lote: string;
   fk_id_ubicacion: number;
   estado: string;
 }
 
 const CrearLote = () => {
-  const mutation = useCrearLote();
+  const { mutate, isError, isSuccess, error } = useCrearLote();
   const navigate = useNavigate();
-  const { data: ubicaciones = [], isLoading, isError } = useUbicaciones();
+  const { data: ubicaciones = [], isLoading, isError: isUbicacionesError } = useUbicaciones();
 
-  console.log('Estado de useUbicaciones:', { isLoading, isError, ubicaciones }); // Depuración
-
-  // Definir los campos del formulario
   const formFields = [
     {
       id: 'fk_id_ubicacion',
@@ -27,7 +23,7 @@ const CrearLote = () => {
       type: 'select',
       options: isLoading
         ? [{ value: '', label: 'Cargando ubicaciones...' }]
-        : isError
+        : isUbicacionesError
         ? [{ value: '', label: 'Error al cargar ubicaciones' }]
         : ubicaciones.length === 0
         ? [{ value: '', label: 'No hay ubicaciones disponibles' }]
@@ -59,7 +55,6 @@ const CrearLote = () => {
     },
   ];
 
-  // Manejar el envío del formulario
   const handleSubmit = (formData: { [key: string]: string }) => {
     if (
       !formData.fk_id_ubicacion ||
@@ -71,33 +66,30 @@ const CrearLote = () => {
       return;
     }
 
-    const nuevoLote: Omit<Lote, 'id'> = {
+    const nuevoLote: Lote = {
+      id: 0, // Incluimos id como 0 para satisfacer el tipo Lote, pero el backend lo ignora
       fk_id_ubicacion: Number(formData.fk_id_ubicacion),
-      dimension: formData.dimension, // Enviado como string para coincidir con el backend
+      dimension: formData.dimension,
       nombre_lote: formData.nombre_lote.trim(),
       estado: formData.estado,
     };
 
-    mutation.mutate(nuevoLote, {
+    mutate(nuevoLote, {
       onSuccess: () => {
-        console.log('✅ Lote creado correctamente');
         navigate('/Lotes');
-      },
-      onError: (error) => {
-        console.error('❌ Error al crear el lote:', error);
       },
     });
   };
 
   return (
     <div className="p-10">
-      {mutation.isError && <p className="text-red-500">Error: {mutation.error?.message}</p>}
-      {mutation.isSuccess && <p className="text-green-500">Lote creado con éxito</p>}
+      {isError && <p className="text-red-500">Error: {error?.message}</p>}
+      {isSuccess && <p className="text-green-500">Lote creado con éxito</p>}
       <Formulario
         fields={formFields}
         onSubmit={handleSubmit}
-        isError={mutation.isError}
-        isSuccess={mutation.isSuccess}
+        isError={isError}
+        isSuccess={isSuccess}
         title="Crear Lote"
       />
     </div>

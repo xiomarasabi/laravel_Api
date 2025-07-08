@@ -15,19 +15,19 @@ export const useCrearHerramientas = () => {
 
     return useMutation({
         mutationFn: async (nuevoHerramienta: Herramientas) => {
-            //const token = localStorage.getItem("token");
-            //console.log(token);
-            //console.log(nuevoHerramienta)
-            //if (!token) {
-            //    throw new Error("No se ha encontrado un token de autenticación");
-            //}
+            const token = localStorage.getItem("token");
+            console.log(token);
+            console.log(nuevoHerramienta)
+            if (!token) {
+                throw new Error("No se ha encontrado un token de autenticación");
+            }
             const data  = await axios.post(
                 `${apiUrl}herramientas/`,
                 nuevoHerramienta,
                 {
-                    //headers: {
-                    //    Authorization: `Bearer ${token}`,
-                    //},
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
             return data;
