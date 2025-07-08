@@ -137,8 +137,8 @@ function App() {
           <Route path="/registrar-producción" element={<Principal><CrearProduccionPage /></Principal>} />
           <Route path="/ventas" element={<Principal><VentaPage /></Principal>} />
           <Route path="/registrar-venta" element={<Principal><CrearVentaPage /></Principal>} />
-          <Route path="/actualizarproduccion/:id_produccion" element={<Principal><ActualizarProduccionPage /></Principal>} />
-          <Route path="/actualizarventa/:id_venta" element={<Principal><ActualizarVentaPage /></Principal>} />
+          <Route path="/actualizarproduccion/:id" element={<Principal><ActualizarProduccionPage /></Principal>} />
+          <Route path="/actualizarventa/:id" element={<Principal><ActualizarVentaPage /></Principal>} />
           <Route path="/grafica-produccion" element={<Principal><GraficaProduccionPorLote /></Principal>} />
           <Route path="/graficas-ventas" element={<Principal><GraficasVentas /></Principal>} />
           {/* Ruta por defecto para manejar errores 404 */}

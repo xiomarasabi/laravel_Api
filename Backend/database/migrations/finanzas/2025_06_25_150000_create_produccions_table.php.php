@@ -23,8 +23,8 @@ return new class extends Migration
             $table->date('fecha_cosecha')->nullable();
 
             // Relaciones (foreign keys)
-            $table->foreign('fk_id_lote')->references('id')->on('lote');
-            $table->foreign('fk_id_cultivo')->references('id')->on('cultivo');
+            $table->foreign('fk_id_lote')->references('id')->on('lotes');
+            $table->foreign('fk_id_cultivo')->references('id')->on('cultivos');
         });
     }
 

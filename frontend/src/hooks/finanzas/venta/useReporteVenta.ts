@@ -8,7 +8,7 @@ const useReporteVentasPDF = () => {
   const generarPDF = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get(`${apiUrl}venta/reporte_ventas`, {
+      const { data } = await axios.get(`${apiUrl}ventas/reporte_ventas`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -22,9 +22,9 @@ const useReporteVentasPDF = () => {
 
       autoTable(doc, {
         startY: 30,
-        head: [["ID Producción", "Descripción", "Cantidad Vendida", "Total Recaudado"]],
+        head: [["ID", "Descripción", "Cantidad Vendida", "Total Recaudado"]],
         body: ventas.map((v: any) => [
-          v.id_produccion,
+          v.id,
           v.descripcion_produccion,
           v.total_cantidad_vendida,
           `$${Number(v.total_recaudado).toFixed(2)}`,

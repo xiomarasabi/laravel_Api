@@ -21,8 +21,8 @@ const CrearProduccion = () => {
       options: [
         { value: '', label: 'Seleccione un cultivo' },
         ...cultivos.map((cultivo) => ({
-          value: String(cultivo.id_cultivo),
-          label: cultivo.nombre_cultivo || `Cultivo ID ${cultivo.id_cultivo}`,
+          value: String(cultivo.id),
+          label: cultivo.nombre_cultivo || `Cultivo ID ${cultivo.id}`,
         })),
       ],
     },

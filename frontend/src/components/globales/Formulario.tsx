@@ -100,7 +100,9 @@ const Formulario: React.FC<FormProps> = ({ fields, onSubmit, isError, isSuccess,
                 </div>
             )}
             <div className="flex justify-center items-center mt-8">
-                <Button text="Registrar" className='mx-2' onClick={handleButtonClick}  variant="success" />
+                <button type="submit" className="mx-2 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+  Registrar
+</button>
                 <Button text="Cancelar" className="mx-2" onClick={() => navigate(-1)} variant="danger" />
 
             </div>

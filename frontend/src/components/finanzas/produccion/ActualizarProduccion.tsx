@@ -8,8 +8,8 @@ import { useCultivo } from "../../../hooks/trazabilidad/cultivo/useCultivo";
 import { useLotes } from "../../../hooks/iot/lote/useLotes";
 
 const ActualizarProduccion = () => {
-  const { id_produccion } = useParams();
-  const { data: produccion, isLoading, error } = useProduccionId(id_produccion);
+  const { id } = useParams();
+  const { data: produccion, isLoading, error } = useProduccionId(id);
   const { data: cultivos = [] } = useCultivo(); // Hook para obtener cultivos
   const { data: lotes = [] } = useLotes(); // Hook para obtener lotes
   const actualizarProduccion = useActualizarProduccion();
@@ -45,10 +45,10 @@ const ActualizarProduccion = () => {
   }, [produccion]);
 
   const handleSubmit = (data: { [key: string]: string }) => {
-    if (!id_produccion) return;
+    if (!id) return;
 
     const produccionActualizada = {
-      id_produccion: Number(id_produccion),
+      id: Number(id),
       nombre_produccion: data.nombre_produccion,
       fk_id_cultivo: data.fk_id_cultivo ? parseInt(data.fk_id_cultivo, 10) : null,
       cantidad_producida: parseFloat(data.cantidad_producida),
@@ -79,8 +79,8 @@ const ActualizarProduccion = () => {
       label: "Cultivo",
       type: "select",
       options: cultivos.map((cultivo) => ({
-        value: String(cultivo.id_cultivo),
-        label: cultivo.nombre_cultivo || `Cultivo ID ${cultivo.id_cultivo}`,
+        value: String(cultivo.id),
+        label: cultivo.nombre_cultivo || `Cultivo ID ${cultivo.id}`,
       })),
     },
     { id: "nombre_produccion", label: "Nombre", type: "text" },
