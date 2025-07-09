@@ -14,18 +14,17 @@ const CrearUsuario = () => {
         { id: 'identificacion', label: 'Identificación', type: 'text' }, 
         { id: 'email', label: 'Email', type: 'text' },
         { id: 'nombre', label: 'Nombre', type: 'text' },
-        { id: 'contrasena', label: 'Contraseña', type: 'password' },
-        { id: 'telefono', label: 'telefono', type: 'text' },
+        { id: 'password', label: 'Contraseña', type: 'password' },
         { 
             id: "fk_id_rol", 
             label: "Rol", 
             type: "select", 
-            options: Array.isArray(roles) ? roles.map((rol) => ({ value: String(rol.id_rol), label: rol.nombre_rol })) : []
+            options: Array.isArray(roles) ? roles.map((rol) => ({ value: String(rol.id), label: rol.nombre_rol })) : []
         }
     ];
 
     const handleSubmit = (formData: { [key: string]: string }) => {
-        if (!formData.identificacion || !formData.email || !formData.nombre || !formData.contrasena || !formData.fk_id_rol || !formData.telefono) {
+        if (!formData.identificacion || !formData.email || !formData.nombre || !formData.password || !formData.fk_id_rol) {
             console.error('Campos faltantes');
             return;
         }
@@ -42,8 +41,7 @@ const CrearUsuario = () => {
             identificacion,
             email: formData.email,
             nombre: formData.nombre,
-            contrasena: formData.contrasena,
-            telefono: formData.telefono,
+            password: formData.password,
             fk_id_rol
         };
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Rol {
-  id_rol: number;
+  id: number;
   nombre_rol: string;
 }
 
