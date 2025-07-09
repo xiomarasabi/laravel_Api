@@ -1,5 +1,4 @@
 import { useCrearLote } from '../../../hooks/iot/lote/useCrearLote';
-import { useUbicaciones, Ubicacion } from '../../../hooks/iot/ubicacion/useUbicacion';
 import Formulario from '../../globales/Formulario';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,23 +13,13 @@ export interface Lote {
 const CrearLote = () => {
   const { mutate, isError, isSuccess, error } = useCrearLote();
   const navigate = useNavigate();
-  const { data: ubicaciones = [], isLoading, isError: isUbicacionesError } = useUbicaciones();
 
   const formFields = [
     {
       id: 'fk_id_ubicacion',
       label: 'Ubicación',
-      type: 'select',
-      options: isLoading
-        ? [{ value: '', label: 'Cargando ubicaciones...' }]
-        : isUbicacionesError
-        ? [{ value: '', label: 'Error al cargar ubicaciones' }]
-        : ubicaciones.length === 0
-        ? [{ value: '', label: 'No hay ubicaciones disponibles' }]
-        : ubicaciones.map((ubicacion: Ubicacion) => ({
-            value: ubicacion.id.toString(),
-            label: `Ubicación ${ubicacion.id}: Lat ${ubicacion.latitud}, Long ${ubicacion.longitud}`,
-          })),
+      type: 'number',
+      
     },
     {
       id: 'dimension',
@@ -73,6 +62,7 @@ const CrearLote = () => {
       nombre_lote: formData.nombre_lote.trim(),
       estado: formData.estado,
     };
+    console.log("que es ", nuevoLote)
 
     mutate(nuevoLote, {
       onSuccess: () => {

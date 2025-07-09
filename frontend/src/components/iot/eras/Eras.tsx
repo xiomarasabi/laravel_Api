@@ -57,7 +57,7 @@ const Eras = () => {
     const mappedEras: TableRow[] = erasList.map((era: Eras) => ({
         id: era.id,
         descripcion: era.descripcion || 'Sin descripción',
-        lote: era.fk_id_lote?.nombre_lote || 'Sin nombre de lote',
+        lote: era.nombre || 'Sin nombre de lote',
         estado: era.estado || 'Sin estado',
     }));
 

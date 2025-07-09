@@ -5,20 +5,10 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Eras {
-  id: number;
-  fk_id_lote: {
-    id: number;
-    dimension: number;
-    nombre_lote: string;
-    fk_id_ubicacion: {
-      id: number;
-      latitud: number;
-      longitud: number;
-    };
-    estado: string;
-  };
-  descripcion: string;
+  id:number;
+  descripcion:string;
   estado: string;
+  nombre: string;
 }
 
 const fetchEras = async (): Promise<Eras[]> => {
@@ -34,6 +24,7 @@ const fetchEras = async (): Promise<Eras[]> => {
             },
         });
         return data;
+
     } catch (error) {
         console.error("Error al obtener Eras:", error);
         throw new Error("No se pudo obtener la lista de las Eras");

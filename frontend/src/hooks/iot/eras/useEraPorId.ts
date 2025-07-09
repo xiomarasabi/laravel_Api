@@ -1,4 +1,3 @@
-// src/hooks/iot/eras/useEraPorId.ts
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -6,9 +5,9 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Eras {
   id: number;
-  fk_id_lote: number;
   descripcion: string;
   estado: string;
+  lote_nombre: string; 
 }
 
 export const useEraPorId = (id: string | undefined) => {
@@ -29,10 +28,10 @@ export const useEraPorId = (id: string | undefined) => {
       });
       console.log('📋 Datos de la Era obtenidos:', data);
       return {
-        id: data.era.id,
-        descripcion: data.era.descripcion,
-        estado: data.era.estado,
-        fk_id_lote: data.era.fk_id_lote.id,
+        id: data.id,
+        descripcion: data.descripcion,
+        estado: data.estado,
+        lote_nombre: data.lote_nombre,
       } as Eras;
     },
     enabled: !!id && id !== 'undefined',
