@@ -10,9 +10,11 @@ export const useProduccionId = (id_produccion: string | undefined) => {
       if (!id_produccion) throw new Error("ID no proporcionado");
 
       try {
+        const token = localStorage.getItem("token");
         const { data } = await axios.get(`${apiUrl}produccion/${id_produccion}`, {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
 
