@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('notificacion', function (Blueprint $table) {
             $table->id('id_notificacion');
-            $table->string('titulo', 255)->nullable(false);
-            $table->text('mensaje')->nullable(false);
+            $table->string('titulo', 255);
+            $table->text('mensaje');
             $table->unsignedBigInteger('fk_id_programacion');
             $table->foreign('fk_id_programacion')->references('id_programacion')->on('programacion')->onDelete('cascade');
             $table->timestamps();

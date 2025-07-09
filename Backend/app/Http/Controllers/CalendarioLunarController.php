@@ -4,62 +4,71 @@ namespace App\Http\Controllers;
 
 use App\Models\CalendarioLunar;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class CalendarioLunarController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
-        $calendarios = CalendarioLunar::all();
-        return response()->json(['data' => $calendarios, 'message' => 'Eventos lunares retrieved successfully'], 200);
+        try {
+            $calendarios = CalendarioLunar::all();
+            return response()->json($calendarios);
+        } catch (\Exception $e) {
+            return response()->json([
+                'msg' => 'Error al recuperar los eventos lunares',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'fecha' => 'required|date',
             'descripcion_evento' => 'required|string',
             'evento' => 'required|string|max:255',
         ]);
 
-        $calendario = CalendarioLunar::create($validated);
+        $calendario = CalendarioLunar::create($request->all());
 
-        return response()->json(['data' => $calendario, 'message' => 'Evento lunar creado exitosamente'], 201);
+        return response()->json([
+            'msg' => 'Evento lunar registrado con éxito',
+            'calendario' => $calendario
+        ], 201);
     }
 
-    public function put(Request $request, int $id_calendario_lunar): JsonResponse
+    public function show($id)
     {
-        $validated = $request->validate([
-            'fecha' => 'required|date',
-            'descripcion_evento' => 'required|string',
-            'evento' => 'required|string|max:255',
+        $calendario = CalendarioLunar::findOrFail($id);
+        return response()->json($calendario);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $calendario = CalendarioLunar::findOrFail($id);
+
+        $request->validate([
+            'fecha' => 'date',
+            'descripcion_evento' => 'string',
+            'evento' => 'string|max:255',
         ]);
 
-        $calendario = CalendarioLunar::findOrFail($id_calendario_lunar);
-        $calendario->update($validated);
+        $calendario->update($request->all());
 
-        return response()->json(['data' => $calendario, 'message' => 'Evento lunar actualizado exitosamente'], 200);
+        return response()->json($calendario);
     }
 
-    public function patch(Request $request, int $id_calendario_lunar): JsonResponse
+    public function destroy($id)
     {
-        $validated = $request->validate([
-            'fecha' => 'required|date',
-            'descripcion_evento' => 'required|string',
-            'evento' => 'required|string|max:255',
-        ]);
+        try {
+            $calendario = CalendarioLunar::findOrFail($id);
+            $calendario->delete();
 
-        $calendario = CalendarioLunar::findOrFail($id_calendario_lunar);
-        $calendario->update($validated);
-
-        return response()->json(['data' => $calendario, 'message' => 'Evento lunar actualizado exitosamente'], 200);
-    }
-
-    public function delete(int $id_calendario_lunar): JsonResponse
-    {
-        $calendario = CalendarioLunar::findOrFail($id_calendario_lunar);
-        $calendario->delete();
-
-        return response()->json(['message' => 'Evento lunar eliminado exitosamente'], 200);
+            return response()->json(['msg' => 'Evento lunar eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'msg' => 'Error al eliminar el evento lunar',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

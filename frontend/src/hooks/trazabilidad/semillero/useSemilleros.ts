@@ -14,10 +14,10 @@ export interface Semilleros {
 
 const fetchSemilleros = async (): Promise<Semilleros[]> => {
   try {
-    const token = localStorage.getItem('token'); // o donde guardes el JWT
+    //const token = localStorage.getItem('token'); // o donde guardes el JWT
     const { data } = await axios.get(`${apiUrl}semilleros/`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+       // Authorization: `Bearer ${token}`,
       },
     });
     return data.map((item: any) => ({

@@ -36,7 +36,7 @@ export const useEditarAsignacion = () => {
       console.log('📝 Enviando datos para actualizar:', datosValidados);
 
       try {
-        const { data } = await axios.put(`${apiUrl}/asignacion_actividad/${id}`, datosValidados, {
+        const { data } = await axios.put(`${apiUrl}/asignacion_actividades/${id}`, datosValidados, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

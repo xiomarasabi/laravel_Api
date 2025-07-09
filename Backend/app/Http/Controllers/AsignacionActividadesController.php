@@ -2,64 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asignacion_Actividades;
+use App\Models\AsignacionActividad;
+use App\Models\AsignacionActividades;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class AsignacionActividadesController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
-        $asignaciones = Asignacion_Actividades::with(['actividad', 'identificacion'])->get();
-        return response()->json(['data' => $asignaciones, 'message' => 'Asignaciones retrieved successfully'], 200);
+        // Carga las relaciones actividad y user
+        $asignaciones = AsignacionActividades::with(['actividad', 'usuarios'])->get();
+        return response()->json($asignaciones);
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'fecha' => 'required|date',
-            'fk_id_actividad' => 'required|exists:actividad,id_actividad',
-            'fk_identificacion' => 'required|exists:identificacion,id_identificacion', // Adjust based on Identificacion model
+            'fk_id_actividad' => 'required|exists:actividades,id_actividad', // Corrige el nombre de la tabla a 'actividades'
+            'fk_identificacion' => 'required|exists:usuarios,identificacion',
         ]);
 
-        $asignacion = Asignacion_Actividades::create($validated);
+        $asignacion = AsignacionActividades::create($request->all());
 
-        return response()->json(['data' => $asignacion, 'message' => 'Asignación creada exitosamente'], 201);
+        // Carga las relaciones actividad y user
+        $asignacion->load(['actividad', 'usuarios']);
+
+        return response()->json($asignacion, 201);
     }
 
-    public function put(Request $request, int $id_asignacion_actividad): JsonResponse
+    public function show($id)
     {
-        $validated = $request->validate([
-            'fecha' => 'required|date',
-            'fk_id_actividad' => 'required|exists:actividad,id_actividad',
-            'fk_identificacion' => 'required|exists:identificacion,id_identificacion', // Adjust based on Identificacion model
+        // Carga las relaciones actividad y user
+        $asignacion = AsignacionActividades::with(['actividad', 'usuarios'])->findOrFail($id);
+        return response()->json($asignacion);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $asignacion = AsignacionActividades::findOrFail($id);
+
+        $request->validate([
+            'fecha' => 'sometimes|date', // Usa 'sometimes' para permitir actualizaciones parciales
+            'fk_id_actividad' => 'sometimes|exists:actividades,id_actividad', // Corrige el nombre de la tabla
+            'fk_identificacion' => 'sometimes|exists:usuarios,identificacion',
         ]);
 
-        $asignacion = Asignacion_Actividades::findOrFail($id_asignacion_actividad);
-        $asignacion->update($validated);
+        $asignacion->update($request->all());
 
-        return response()->json(['data' => $asignacion, 'message' => 'Asignación actualizada exitosamente'], 200);
+        // Carga las relaciones actividad y user
+        $asignacion->load(['actividad', 'usuarios']);
+
+        return response()->json($asignacion);
     }
 
-    public function patch(Request $request, int $id_asignacion_actividad): JsonResponse
+    public function destroy($id)
     {
-        $validated = $request->validate([
-            'fecha' => 'required|date',
-            'fk_id_actividad' => 'required|exists:actividad,id_actividad',
-            'fk_identificacion' => 'required|exists:identificacion,id_identificacion', // Adjust based on Identificacion model
-        ]);
-
-        $asignacion = Asignacion_Actividades::findOrFail($id_asignacion_actividad);
-        $asignacion->update($validated);
-
-        return response()->json(['data' => $asignacion, 'message' => 'Asignación actualizada exitosamente'], 200);
-    }
-
-    public function delete(int $id_asignacion_actividad): JsonResponse
-    {
-        $asignacion = Asignacion_Actividades::findOrFail($id_asignacion_actividad);
+        $asignacion = AsignacionActividades::findOrFail($id);
         $asignacion->delete();
 
-        return response()->json(['message' => 'Asignación eliminada exitosamente'], 200);
+        return response()->json(['message' => 'Asignación de actividad eliminada correctamente'], 200);
     }
 }

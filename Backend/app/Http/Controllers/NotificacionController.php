@@ -4,62 +4,62 @@ namespace App\Http\Controllers;
 
 use App\Models\Notificacion;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class NotificacionController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
+        // Carga la relación programacion
         $notificaciones = Notificacion::with('programacion')->get();
-        return response()->json(['data' => $notificaciones, 'message' => 'Notificaciones retrieved successfully'], 200);
+        return response()->json($notificaciones);
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'titulo' => 'required|string|max:255',
             'mensaje' => 'required|string',
             'fk_id_programacion' => 'required|exists:programacion,id_programacion',
         ]);
 
-        $notificacion = Notificacion::create($validated);
+        $notificacion = Notificacion::create($request->all());
 
-        return response()->json(['data' => $notificacion, 'message' => 'Notificación creada exitosamente'], 201);
+        // Carga la relación programacion
+        $notificacion->load('programacion');
+
+        return response()->json($notificacion, 201);
     }
 
-    public function put(Request $request, int $id_notificacion): JsonResponse
+    public function show($id_notificacion)
     {
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'mensaje' => 'required|string',
-            'fk_id_programacion' => 'required|exists:programacion,id_programacion',
-        ]);
+        // Carga la relación programacion
+        $notificacion = Notificacion::with('programacion')->findOrFail($id_notificacion);
+        return response()->json($notificacion);
+    }
 
+    public function update(Request $request, $id_notificacion)
+    {
         $notificacion = Notificacion::findOrFail($id_notificacion);
-        $notificacion->update($validated);
 
-        return response()->json(['data' => $notificacion, 'message' => 'Notificación actualizada exitosamente'], 200);
-    }
-
-    public function patch(Request $request, int $id_notificacion): JsonResponse
-    {
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'mensaje' => 'required|string',
-            'fk_id_programacion' => 'required|exists:programacion,id_programacion',
+        $request->validate([
+            'titulo' => 'sometimes|string|max:255',
+            'mensaje' => 'sometimes|string',
+            'fk_id_programacion' => 'sometimes|exists:programacion,id_programacion',
         ]);
 
-        $notificacion = Notificacion::findOrFail($id_notificacion);
-        $notificacion->update($validated);
+        $notificacion->update($request->all());
 
-        return response()->json(['data' => $notificacion, 'message' => 'Notificación actualizada exitosamente'], 200);
+        // Carga la relación programacion
+        $notificacion->load('programacion');
+
+        return response()->json($notificacion);
     }
 
-    public function delete(int $id_notificacion): JsonResponse
+    public function destroy($id_notificacion)
     {
         $notificacion = Notificacion::findOrFail($id_notificacion);
         $notificacion->delete();
 
-        return response()->json(['message' => 'Notificación eliminada exitosamente'], 200);
+        return response()->json(['message' => 'Notificación eliminada correctamente'], 200);
     }
 }

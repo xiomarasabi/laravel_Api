@@ -4,59 +4,55 @@ namespace App\Http\Controllers;
 
 use App\Models\Actividad;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ActividadController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
         $actividades = Actividad::all();
-        return response()->json(['data' => $actividades, 'message' => 'Actividades retrieved successfully'], 200);
+        return response()->json($actividades);
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'nombre_actividad' => 'required|string|max:255',
             'descripcion' => 'required|string',
         ]);
 
-        $actividad = Actividad::create($validated);
+        $actividad = Actividad::create($request->all());
 
-        return response()->json(['data' => $actividad, 'message' => 'Actividad creada exitosamente'], 201);
+        return response()->json([
+            'msg' => 'Actividad registrada con éxito',
+            'actividad' => $actividad
+        ], 201);
     }
 
-    public function put(Request $request, int $id_actividad): JsonResponse
+    public function show($id)
     {
-        $validated = $request->validate([
-            'nombre_actividad' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+        $actividad = Actividad::findOrFail($id);
+        return response()->json($actividad);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $actividad = Actividad::findOrFail($id);
+
+        $request->validate([
+            'nombre_actividad' => 'string|max:255',
+            'descripcion' => 'string',
         ]);
 
-        $actividad = Actividad::findOrFail($id_actividad);
-        $actividad->update($validated);
+        $actividad->update($request->all());
 
-        return response()->json(['data' => $actividad, 'message' => 'Actividad actualizada exitosamente'], 200);
+        return response()->json($actividad);
     }
 
-    public function patch(Request $request, int $id_actividad): JsonResponse
+    public function destroy($id)
     {
-        $validated = $request->validate([
-            'nombre_actividad' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-        ]);
-
-        $actividad = Actividad::findOrFail($id_actividad);
-        $actividad->update($validated);
-
-        return response()->json(['data' => $actividad, 'message' => 'Actividad actualizada exitosamente'], 200);
-    }
-
-    public function delete(int $id_actividad): JsonResponse
-    {
-        $actividad = Actividad::findOrFail($id_actividad);
+        $actividad = Actividad::findOrFail($id);
         $actividad->delete();
 
-        return response()->json(['message' => 'Actividad eliminada exitosamente'], 200);
+        return response()->json(['msg' => 'Actividad eliminada correctamente']);
     }
 }
