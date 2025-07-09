@@ -73,11 +73,20 @@ export default function Principal({ children }: LayoutProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem("user");
-    if (usuarioGuardado) {
+  const usuarioGuardado = localStorage.getItem("user");
+
+  try {
+    if (usuarioGuardado && usuarioGuardado !== "undefined") {
       setUsuario(JSON.parse(usuarioGuardado));
+    } else {
+      setUsuario(null);
     }
-  }, []);
+  } catch (error) {
+    console.error("Error al parsear el usuario:", error);
+    setUsuario(null);
+  }
+}, []);
+
 
   const toggleMenu = (name: string) => {
     setOpenMenus((prev) => ({ ...prev, [name]: !prev[name] }));

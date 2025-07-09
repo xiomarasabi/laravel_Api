@@ -60,7 +60,6 @@ const Usuarios = () => {
         usuario.identificacion,
         usuario.nombre,
         usuario.email,
-        usuario.telefono,
         usuario.fk_id_rol?.nombre_rol || "Sin rol asignado"
       ]),
       startY: 20,
@@ -73,7 +72,7 @@ const Usuarios = () => {
     }
   };
 
-  const headers = ["Identificacion","Nombre","Email", "Rol", "telefono"];
+  const headers = ["Identificacion","Nombre","Email", "Rol"];
 
   return (
     <div className="overflow-x-auto rounded-lg p-4">
@@ -114,7 +113,6 @@ const Usuarios = () => {
             identificacion: usuario.identificacion,
             nombre: usuario.nombre,
             email: usuario.email,
-            telefono: usuario.telefono,
             rol: usuario.fk_id_rol?.nombre_rol || "Sin rol asignado",
           }))}
           onClickAction={openModalHandler}
