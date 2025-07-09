@@ -6,6 +6,18 @@ import VentanaModal from "../globales/VentanasModales";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+// Función para decodificar el token
+function decodificarToken(token: string) {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded;
+  } catch (error) {
+    console.error("Error al decodificar el token:", error);
+    return null;
+  }
+}
+
 const Usuarios = () => {
   const navigate = useNavigate();
   const { data: usuarios, isLoading, error } = useUsuarios();
@@ -15,9 +27,13 @@ const Usuarios = () => {
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem("user");
-    const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
-    setEsAdministrador(usuario?.rol?.nombre === "Administrador");
+    const token = localStorage.getItem("token");
+    if (token) {
+      const datos = decodificarToken(token);
+      setEsAdministrador(datos?.rol === "Administrador");
+    } else {
+      setEsAdministrador(false);
+    }
   }, []);
 
   const openModalHandler = useCallback((usuario: Record<string, any>) => {
@@ -32,7 +48,6 @@ const Usuarios = () => {
       setMensaje("No tienes permisos para actualizar usuarios.");
       setTimeout(() => setMensaje(null), 3000);
     }
-    
   };
 
   const handleCreate = () => {
@@ -51,28 +66,28 @@ const Usuarios = () => {
 
   const handleDownloadPDF = () => {
     if (esAdministrador) {
-    const doc = new jsPDF();
-    doc.text("Lista de Usuarios", 14, 10);
+      const doc = new jsPDF();
+      doc.text("Lista de Usuarios", 14, 10);
 
-    autoTable(doc, {
-      head: [["identificacion","nombre", "Email", "rol"]],
-      body: (usuarios ?? []).map((usuario) => [
-        usuario.identificacion,
-        usuario.nombre,
-        usuario.email,
-        usuario.fk_id_rol?.nombre_rol || "Sin rol asignado"
-      ]),
-      startY: 20,
-    });
+      autoTable(doc, {
+        head: [["identificacion", "nombre", "Email", "rol"]],
+        body: (usuarios ?? []).map((usuario) => [
+          usuario.identificacion,
+          usuario.nombre,
+          usuario.email,
+          usuario.rol?.nombre_rol || "Sin rol asignado",
+        ]),
+        startY: 20,
+      });
 
-    doc.save("usuarios.pdf");
-  } else {
+      doc.save("usuarios.pdf");
+    } else {
       setMensaje("No tienes permisos para descargar informes de usuarios.");
       setTimeout(() => setMensaje(null), 3000);
     }
   };
 
-  const headers = ["Identificacion","Nombre","Email", "Rol"];
+  const headers = ["Identificacion", "Nombre", "Email", "Rol"];
 
   return (
     <div className="overflow-x-auto rounded-lg p-4">
@@ -113,7 +128,7 @@ const Usuarios = () => {
             identificacion: usuario.identificacion,
             nombre: usuario.nombre,
             email: usuario.email,
-            rol: usuario.fk_id_rol?.nombre_rol || "Sin rol asignado",
+            rol: usuario.rol?.nombre_rol || "Sin rol asignado",
           }))}
           onClickAction={openModalHandler}
           onUpdate={handleUpdate}

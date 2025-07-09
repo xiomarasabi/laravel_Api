@@ -6,10 +6,9 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Usuario {
   identificacion: number;
-  contrasena: string;
+  password: string;
   email: string;
   nombre: string;
-  telefono: string;
   fk_id_rol: number; 
 }
 
@@ -27,12 +26,13 @@ export const useCreateUsuarios = () =>{
           throw new Error("No se ha encontrado un token de autenticacion");
         }
   const {data} = await axios.post(
-    `${apiUrl}usuarios/`,
+    `${apiUrl}usuario/`,
     nuevoUsuario,
     {
 
       headers: {
-        Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json", // 👈 ESTE FALTABA
       },
     }
   );

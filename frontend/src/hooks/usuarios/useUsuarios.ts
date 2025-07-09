@@ -15,7 +15,7 @@ export interface Usuario {
   email: string;
   nombre: string;
   telefono: string;
-  fk_id_rol: Rol | null; 
+  rol: Rol | null; 
 }
 
 // Función para obtener usuarios
