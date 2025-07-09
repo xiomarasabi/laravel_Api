@@ -11,7 +11,7 @@ class AsignacionActividadesController extends Controller
     public function index()
     {
         // Carga las relaciones actividad y user
-        $asignaciones = AsignacionActividades::with(['actividad', 'user'])->get();
+        $asignaciones = AsignacionActividades::with(['actividad', 'usuarios'])->get();
         return response()->json($asignaciones);
     }
 
@@ -20,13 +20,13 @@ class AsignacionActividadesController extends Controller
         $request->validate([
             'fecha' => 'required|date',
             'fk_id_actividad' => 'required|exists:actividades,id_actividad', // Corrige el nombre de la tabla a 'actividades'
-            'fk_identificacion' => 'required|exists:users,id',
+            'fk_identificacion' => 'required|exists:usuarios,identificacion',
         ]);
 
         $asignacion = AsignacionActividades::create($request->all());
 
         // Carga las relaciones actividad y user
-        $asignacion->load(['actividad', 'user']);
+        $asignacion->load(['actividad', 'usuarios']);
 
         return response()->json($asignacion, 201);
     }
@@ -34,7 +34,7 @@ class AsignacionActividadesController extends Controller
     public function show($id)
     {
         // Carga las relaciones actividad y user
-        $asignacion = AsignacionActividades::with(['actividad', 'user'])->findOrFail($id);
+        $asignacion = AsignacionActividades::with(['actividad', 'usuarios'])->findOrFail($id);
         return response()->json($asignacion);
     }
 
@@ -45,13 +45,13 @@ class AsignacionActividadesController extends Controller
         $request->validate([
             'fecha' => 'sometimes|date', // Usa 'sometimes' para permitir actualizaciones parciales
             'fk_id_actividad' => 'sometimes|exists:actividades,id_actividad', // Corrige el nombre de la tabla
-            'fk_identificacion' => 'sometimes|exists:users,id',
+            'fk_identificacion' => 'sometimes|exists:usuarios,identificacion',
         ]);
 
         $asignacion->update($request->all());
 
         // Carga las relaciones actividad y user
-        $asignacion->load(['actividad', 'user']);
+        $asignacion->load(['actividad', 'usuarios']);
 
         return response()->json($asignacion);
     }

@@ -24,6 +24,6 @@ class AsignacionActividades extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'fk_identificacion', 'id');
+        return $this->belongsTo(Usuario::class, 'fk_identificacion', 'identificacion');
     }
 }
