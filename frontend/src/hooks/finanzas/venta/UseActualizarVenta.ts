@@ -28,7 +28,7 @@ export const useActualizarVenta = () => {
         datos,
         {
           headers: {
-            //Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
