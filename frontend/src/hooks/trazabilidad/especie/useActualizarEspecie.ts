@@ -21,7 +21,7 @@ export const useActualizarEspecie = () => {
             const token = localStorage.getItem("token");
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-            const { data } = await axios.put(`${apiUrl}especie/${id}`, datos, { headers });
+            const { data } = await axios.put(`${apiUrl}especies/${id}`, datos, { headers });
             return data;
         },
         onSuccess: () => {

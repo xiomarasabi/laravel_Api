@@ -8,28 +8,39 @@ const useReporteEspeciePDF = () => {
   const generarPDF = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get(`${apiUrl}especie/reporte`, {
+
+      const { data: especies } = await axios.get(`${apiUrl}especies`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const especies = data.reporte;
-      console.log("a ver que trae esto",especies)
-
       const doc = new jsPDF();
       doc.setFontSize(16);
-      doc.text("Reporte de especies", 14, 20);
+      doc.text("Reporte de Especies", 14, 20);
 
       autoTable(doc, {
         startY: 30,
-        head: [["ID Tipo Cultivo", "Tipo Cultivo", "Total Especies"]],
-        body: especies.map((p: any) => [
-          p.id_tipo_cultivo,
-          p.tipo_cultivo,
-          p.total_especies,
+        head: [
+          [
+            "ID",
+            "Nombre Común",
+            "Nombre Científico",
+            "Descripción",
+            "ID Tipo Cultivo",
+            "Tipo Cultivo",
+          ],
+        ],
+        body: especies.map((especie: any) => [
+          especie.id,
+          especie.nombre_comun || "Sin nombre común",
+          especie.nombre_cientifico || "Sin nombre científico",
+          especie.descripcion || "Sin descripción",
+          especie.fk_id_tipo_cultivo || "Sin ID",
+          especie.tipo_cultivo?.nombre || "Sin tipo cultivo",
         ]),
       });
+
       doc.save("reporte_especies.pdf");
     } catch (error) {
       console.error("❌ Error al generar el reporte de especies:", error);
