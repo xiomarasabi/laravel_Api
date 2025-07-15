@@ -10,6 +10,7 @@ class AsignacionActividades extends Model
     use HasFactory;
 
     protected $table = 'asignacion_actividades';
+    protected $primaryKey = 'id_asignacion_actividad';
 
     protected $fillable = [
         'fecha',

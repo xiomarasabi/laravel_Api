@@ -1,16 +1,14 @@
 import { Asignacion } from '@/hooks/trazabilidad/asignacion/useCrearAsignacion';
 import { useCrearAsignacion } from '@/hooks/trazabilidad/asignacion/useCrearAsignacion';
-import { useQueryClient } from '@tanstack/react-query';
-import Formulario from '../../globales/Formulario';
 import { useUsuarios } from '@/hooks/usuarios/useUsuarios';
 import { useAsignacion } from '@/hooks/trazabilidad/asignacion/useAsignacion';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Formulario from '../../globales/Formulario';
 
 const CrearAsignacion = () => {
   const mutation = useCrearAsignacion();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: usuarios = [], isLoading: isLoadingUsuarios, error: usuariosError } = useUsuarios();
   const { data: asignaciones = [], isLoading: isLoadingAsignaciones, error: asignacionesError } = useAsignacion();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -19,19 +17,19 @@ const CrearAsignacion = () => {
   const actividadOptions = Array.from(
     new Map(
       asignaciones.map((asignacion) => [
-        asignacion.fk_id_actividad.id.toString(),
+        asignacion.actividad?.id_actividad?.toString() || '',
         {
-          value: asignacion.fk_id_actividad.id.toString(),
-          label: asignacion.fk_id_actividad.nombre_actividad || 'Sin nombre',
+          value: asignacion.actividad?.id_actividad?.toString() || '',
+          label: asignacion.actividad?.nombre_actividad || 'Sin nombre',
         },
       ])
     ).values()
-  );
+  ).filter((option) => option.value !== ''); // Filtrar opciones vacías
 
   // Mapeo de opciones para el select de usuarios
   const usuarioOptions = usuarios.map((usr) => ({
-    value: usr.identificacion?.toString() || (usr.id?.toString() || ''),
-    label: `${usr.nombre || 'Sin nombre'} ${usr.apellido || ''}`.trim() || 'Usuario sin nombre',
+    value: usr.identificacion?.toString() || '',
+    label: `${usr.nombre || 'Sin nombre'}`.trim() || 'Usuario sin nombre',
   }));
 
   // Depuración
@@ -76,14 +74,14 @@ const CrearAsignacion = () => {
     const requiredFields = ['fecha', 'fk_id_actividad', 'fk_identificacion'];
     const missingFields = requiredFields.filter((field) => !formData[field] || formData[field] === '');
     if (missingFields.length > 0) {
-      setErrorMessage(`Los siguientes campos son obligatorios: ${missingFields.join(', ')}`);
+      setErrorMessage(`Por favor, completa los campos obligatorios: ${missingFields.join(', ')}`);
       return;
     }
 
     const newAsignacion: Asignacion = {
       fecha: formData.fecha,
-      fk_id_actividad: String(formData.fk_id_actividad),
-      fk_identificacion: String(formData.fk_identificacion),
+      fk_id_actividad: formData.fk_id_actividad,
+      fk_identificacion: formData.fk_identificacion,
     };
 
     console.log('🚀 Enviando asignación al backend:', newAsignacion);
@@ -91,8 +89,7 @@ const CrearAsignacion = () => {
     mutation.mutate(newAsignacion, {
       onSuccess: (response) => {
         console.log('✅ Asignación creada con éxito:', response);
-        queryClient.invalidateQueries({ queryKey: ['asignaciones'] });
-        navigate('/actividad');
+        navigate('/actividad'); // Corregido para redirigir a la lista de asignaciones
       },
       onError: (error: any) => {
         console.error('❌ Error al crear asignación:', {
@@ -101,7 +98,8 @@ const CrearAsignacion = () => {
           status: error.response?.status,
         });
         setErrorMessage(
-          error.response?.data?.msg || error.message || 'Error al crear la asignación. Por favor, intenta de nuevo.'
+          error.response?.data?.message ||
+            'Error al crear la asignación. Verifica los datos e intenta de nuevo.'
         );
       },
     });
@@ -138,9 +136,7 @@ const CrearAsignacion = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       {errorMessage && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          {errorMessage}
-        </div>
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">{errorMessage}</div>
       )}
       <Formulario
         fields={formFields}

@@ -99,5 +99,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('programacion', ProgramacionController::class);
     Route::apiResource('notificacion', NotificacionController::class);
     Route::apiResource('realiza', RealizaController::class);
+
 });
 

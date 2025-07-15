@@ -8,13 +8,12 @@ const useReporteSemilleroPDF = () => {
   const generarPDF = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get(`${apiUrl}semilleros/reporte`, {
+
+      const { data: semilleros } = await axios.get(`${apiUrl}semilleros`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      const { total_semilleros, nombres_semilleros } = data.reporte;
 
       const doc = new jsPDF();
       doc.setFontSize(16);
@@ -22,11 +21,14 @@ const useReporteSemilleroPDF = () => {
 
       autoTable(doc, {
         startY: 30,
-        head: [["Total de Semilleros", "Nombres"]],
-        body: [[
-          total_semilleros,
-          nombres_semilleros || "Sin nombres registrados"
-        ]]
+        head: [["ID", "Nombre Semilla", "Fecha Siembra", "Fecha Estimada", "Cantidad"]],
+        body: semilleros.map((s: any) => [
+          s.id,
+          s.nombre_semilla,
+          s.fecha_siembra,
+          s.fecha_estimada,
+          s.cantidad,
+        ]),
       });
 
       doc.save("reporte_semilleros.pdf");
