@@ -102,7 +102,7 @@ const EditarSensor = () => {
       onSuccess: (response) => {
         console.log("✅ Sensor actualizado correctamente:", response);
         setFormError(null);
-        navigate("/iot/sensores");
+        navigate("/sensores");
       },
       onError: (err: any) => {
         const errorMessage = err.message || "Error al actualizar el sensor.";

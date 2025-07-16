@@ -56,7 +56,7 @@ const menuItems = [
   {
     name: "IoT",
     icon: <Cpu size={18} />,
-    submenu: [{ name: "Sensores", path: "/iot/sensores" }],
+    submenu: [{ name: "Sensores", path: "/sensores" }],
   },
 ];
 

@@ -24,6 +24,7 @@ use App\Http\Controllers\ControlFitosanitarioController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProgramacionController;
 use App\Http\Controllers\RealizaController;
+use App\Http\Controllers\SensorController;
 
 Route::prefix('produccion')->group(function () {
     Route::get('reporte', [ProduccionController::class, 'getReporteProduccion']);
@@ -51,6 +52,7 @@ Route::apiResource('residuos', ResiduoController::class);
 Route::apiResource('peas', PeaController::class);
 Route::apiResource('desarrollan', DesarrollanController::class);
 Route::apiResource('control_fitosanitario', ControlFitosanitarioController::class);
+Route::apiResource('sensores', SensorController::class);
 
 Route::apiResource('actividad', ActividadController::class);
 Route::apiResource('calendario_lunar', CalendarioLunarController::class);

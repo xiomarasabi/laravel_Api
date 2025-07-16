@@ -60,9 +60,9 @@ const CrearSensor = () => {
     mutation.mutate(newSensor, {
       onSuccess: (data) => {
         console.log('✅ Sensor creado, datos:', data);
-        console.log('Intentando redirigir a /iot/sensores');
+        console.log('Intentando redirigir a /sensores');
         try {
-          navigate('/iot/sensores');
+          navigate('/sensores');
           console.log('✅ Redirección ejecutada');
         } catch (err) {
           console.error('❌ Error al redirigir:', err);
