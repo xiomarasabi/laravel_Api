@@ -1,4 +1,3 @@
-// src/components/iot/eras/EditarEras.tsx
 import { useState, useEffect, useMemo } from 'react';
 import { useEditarEras, Eras } from '@/hooks/iot/eras/useEditarEras';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -30,15 +29,17 @@ const EditarEras = () => {
   });
 
   useEffect(() => {
-    if (era) {
+    if (era && lotes.length > 0) {
       console.log('🔄 Cargando datos de la Era:', era);
+      // Buscar el id del lote correspondiente al lote_nombre
+      const lote = lotes.find((l) => l.nombre_lote === era.lote_nombre);
       setFormData({
-        fk_id_lote: era.fk_id_lote.toString() || '',
+        fk_id_lote: lote ? lote.id.toString() : '',
         descripcion: era.descripcion || '',
         estado: era.estado || 'Activo',
       });
     }
-  }, [era]);
+  }, [era, lotes]);
 
   const initialValues = useMemo(() => formData, [formData]);
 

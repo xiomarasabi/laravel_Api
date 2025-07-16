@@ -13,7 +13,6 @@ const Asignaciones = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModalHandler = useCallback((asignacion: Record<string, any>) => {
-    // Guardamos la asignación original, no el objeto mapeado
     setSelectedAsignacion(asignacion);
     setIsModalOpen(true);
   }, []);
@@ -35,24 +34,24 @@ const Asignaciones = () => {
     const doc = new jsPDF();
     doc.text('Lista de Asignaciones', 14, 10);
 
-    let currentY = 20;
+    // Tabla principal de asignaciones
     autoTable(doc, {
-      head: [['ID', 'Fecha', 'Actividad', 'Usuario', 'Email']],
+      head: [['Id_asignacion_actividades', 'Fecha', 'Actividad', 'Usuario', 'Email']],
       body: asignaciones.map((asignacion) => [
-        asignacion.id,
+        asignacion.id_asignacion_actividad,
         asignacion.fecha
           ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
           : 'Sin fecha',
-        asignacion.fk_id_actividad?.nombre_actividad || 'Sin actividad',
-        asignacion.fk_id_actividad?.fk_identificacion?.nombre || 'Sin usuario',
-        asignacion.fk_id_actividad?.fk_identificacion?.email || 'Sin email',
+        asignacion.actividad?.nombre_actividad || 'Sin actividad',
+        asignacion.user?.nombre || 'Sin usuario',
+        asignacion.user?.email || 'Sin email',
       ]),
-      startY: currentY,
+      startY: 20,
     });
-    currentY = doc.internal.pageSize.height - 10;
 
+    // Reporte agrupado por actividad
     const actividadReporte = asignaciones.reduce((acc, asignacion) => {
-      const nombre = asignacion.fk_id_actividad?.nombre_actividad || 'Sin nombre';
+      const nombre = asignacion.actividad?.nombre_actividad || 'Sin actividad';
       if (!acc[nombre]) {
         acc[nombre] = [];
       }
@@ -60,8 +59,10 @@ const Asignaciones = () => {
       return acc;
     }, {} as Record<string, any[]>);
 
-    doc.text('Reporte de Actividades por Nombre', 14, currentY + 10);
-    currentY += 20;
+    let currentY = (doc as any).lastAutoTable.finalY + 10; // Posición después de la tabla principal
+
+    doc.text('Reporte de Actividades por Nombre', 14, currentY);
+    currentY += 10;
 
     Object.entries(actividadReporte).forEach(([nombre, asignacionesGrupo]) => {
       doc.text(`${nombre} (Cantidad: ${asignacionesGrupo.length})`, 14, currentY);
@@ -70,18 +71,18 @@ const Asignaciones = () => {
       autoTable(doc, {
         head: [['ID', 'Fecha', 'Actividad', 'Usuario', 'Email']],
         body: asignacionesGrupo.map((asignacion) => [
-          asignacion.id,
+          asignacion.id ||'sin id',
           asignacion.fecha
             ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
             : 'Sin fecha',
-          asignacion.fk_id_actividad?.nombre_actividad || 'Sin actividad',
-          asignacion.fk_id_actividad?.fk_identificacion?.nombre || 'Sin usuario',
-          asignacion.fk_id_actividad?.fk_identificacion?.email || 'Sin email',
+          asignacion.actividad?.nombre_actividad || 'Sin actividad',
+          asignacion.user?.nombre || 'Sin usuario',
+          asignacion.user?.email || 'Sin email',
         ]),
         startY: currentY,
       });
 
-      currentY += 10;
+      currentY = (doc as any).lastAutoTable.finalY + 10;
     });
 
     doc.save('asignaciones.pdf');
@@ -118,18 +119,17 @@ const Asignaciones = () => {
         <Tabla
           title="Lista de Asignaciones"
           headers={headers}
-          // Pasamos el objeto asignacion original a onClickAction
           data={asignaciones.map((asignacion) => ({
-            id: asignacion.id,
+            id: asignacion.id_asignacion_actividad || 'sin id',
             fecha: asignacion.fecha
               ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
               : 'Sin fecha',
-            actividad: asignacion.fk_id_actividad?.nombre_actividad || 'Sin actividad',
-            usuario: asignacion.fk_id_actividad?.fk_identificacion?.nombre || 'Sin usuario',
-            email: asignacion.fk_id_actividad?.fk_identificacion?.email || 'Sin email',
-            original: asignacion, // Añadimos el objeto original
+            actividad: asignacion.actividad?.nombre_actividad || 'Sin actividad',
+            usuario: asignacion.user?.nombre || 'Sin usuario',
+            email: asignacion.user?.email || 'Sin email',
+            original: asignacion, // Objeto original para acciones
           }))}
-          onClickAction={(row) => openModalHandler(row.original)} // Pasamos el objeto original
+          onClickAction={(row) => openModalHandler(row.original)}
           onUpdate={handleUpdate}
           onCreate={handleCreate}
           createButtonTitle="Crear"
@@ -142,15 +142,15 @@ const Asignaciones = () => {
           onClose={closeModal}
           titulo="Detalles de la Asignación"
           contenido={{
-            ID: selectedAsignacion.id,
+            ID: selectedAsignacion.id || 'sin id',
             Fecha: selectedAsignacion.fecha
               ? new Date(selectedAsignacion.fecha).toLocaleDateString('es-ES')
               : 'Sin fecha',
-            Actividad: selectedAsignacion.fk_id_actividad?.nombre_actividad || 'Sin actividad',
-            Descripción: selectedAsignacion.fk_id_actividad?.descripcion || 'Sin descripción',
-            Usuario: selectedAsignacion.fk_id_actividad?.fk_identificacion?.nombre || 'Sin usuario',
-            Email: selectedAsignacion.fk_id_actividad?.fk_identificacion?.email || 'Sin email',
-            Rol: selectedAsignacion.fk_id_actividad?.fk_identificacion?.fk_id_rol?.nombre_rol || 'Sin rol',
+            Actividad: selectedAsignacion.actividad?.nombre_actividad || 'Sin actividad',
+            Descripción: selectedAsignacion.actividad?.descripcion || 'Sin descripción',
+            Usuario: selectedAsignacion.user?.nombre || 'Sin usuario',
+            Email: selectedAsignacion.user?.email || 'Sin email',
+            Rol: selectedAsignacion.user?.fk_id_rol?.nombre_rol || 'Sin rol',
           }}
         />
       )}

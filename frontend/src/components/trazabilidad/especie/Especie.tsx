@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { useEspecie } from '../../../hooks/trazabilidad/especie/useEspecie';
-import VentanaModal from '../../globales/VentanasModales';
-import Tabla from '../../globales/Tabla';
+import { useEspecie } from '@/hooks/trazabilidad/especie/useEspecie';
+import VentanaModal from '@/components/globales/VentanasModales';
+import Tabla from '@/components/globales/Tabla';
 import { useNavigate } from 'react-router-dom';
 import useReporteEspeciePDF from '@/hooks/trazabilidad/especie/useReporteEspecie';
 
 const Especies = () => {
-  const { data: especies, error, isLoading } = useEspecie();
+  const { data: especies = [], error } = useEspecie();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEspecie, setSelectedEspecie] = useState<any>(null);
-  const { generarPDF: generarReporteEspecie } = useReporteEspeciePDF();
-
+  const { generarPDF } = useReporteEspeciePDF();
   const navigate = useNavigate();
 
   const openModal = (especie: any) => {
@@ -19,8 +18,8 @@ const Especies = () => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setSelectedEspecie(null);
+    setIsModalOpen(false);
   };
 
   const handleUpdate = (especie: { id: number }) => {
@@ -31,42 +30,41 @@ const Especies = () => {
     navigate('/CrearEspecie');
   };
 
-  if (isLoading) return <div className="text-center text-gray-500">Cargando...</div>;
+  const tablaData = especies.map((e) => ({
+    id: e.id,
+    nombre_comun: e.nombre_comun || 'Sin nombre',
+    nombre_cientifico: e.nombre_cientifico || 'Sin nombre',
+    descripcion: e.descripcion || 'Sin descripción',
+    tipo_cultivo: e.tipo_cultivo?.nombre || 'Sin tipo de cultivo',
+  }));
 
-  if (error)
-    return (
-      <div className="text-center text-red-500">
-        Error al cargar los datos: {error.message}
-      </div>
-    );
-
-    const tablaData = (especies ?? []).map((especie) => ({
-      id: especie.id_especie,
-      nombre_comun: especie.nombre_comun || 'Sin nombre común',
-      nombre_cientifico: especie.nombre_cientifico || 'Sin nombre científico',
-      descripcion: especie.descripcion || 'Sin descripción',
-      tipo_cultivo: especie.tipo_cultivo?.nombre || 'Sin tipo de cultivo',
-    }));
-    
-
-  const headers = ['id', 'Nombre Comun', 'Nombre Cientifico', 'descripcion', 'tipo cultivo'];
+  const headers = ['id', 'Nombre Comun', 'Nombre Cientifico', 'Descripcion', 'Tipo Cultivo'];
 
   return (
-    <div className="">
+    <div className="p-4 space-y-4">
+      <div className="flex justify-between items-center">
         <button
-          onClick={generarReporteEspecie}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          onClick={generarPDF}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          Generar Reporte PDF
+          Generar PDF
         </button>
+      </div>
+
+      {error && (
+        <div className="text-center text-red-500">
+          Error al cargar las especies: {error.message}
+        </div>
+      )}
+
       <Tabla
-        title="Lista de Especies"
+        title="Especies"
         headers={headers}
         data={tablaData}
         onClickAction={openModal}
         onUpdate={handleUpdate}
         onCreate={handleCreate}
-        createButtonTitle="Crear"
+        createButtonTitle="Crear Especie"
       />
 
       {selectedEspecie && (

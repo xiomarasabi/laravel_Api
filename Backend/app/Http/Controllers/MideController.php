@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Mide;
+
 use Illuminate\Http\Request;
 
 class MideController extends Controller
 {
+
     public function index()
     {
         $mides = Mide::with(['sensor', 'era'])->get();
@@ -70,3 +73,4 @@ class MideController extends Controller
         return response()->json(['msg' => 'Medición eliminada correctamente']);
     }
 }
+
