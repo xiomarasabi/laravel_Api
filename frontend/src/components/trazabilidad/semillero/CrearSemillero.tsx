@@ -49,7 +49,6 @@ const CrearSemillero = () => {
     // Enviar la mutación
     mutation.mutate(nuevoSemillero, {
       onSuccess: () => {
-        alert('Semillero creado con éxito');
         navigate('/semilleros');
       },
       onError: (error: any) => {

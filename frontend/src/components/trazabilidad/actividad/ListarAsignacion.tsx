@@ -59,7 +59,7 @@ const Asignaciones = () => {
       return acc;
     }, {} as Record<string, any[]>);
 
-    let currentY = (doc as any).lastAutoTable.finalY + 10; // Posición después de la tabla principal
+    let currentY = (doc as any).lastAutoTable.finalY + 10;
 
     doc.text('Reporte de Actividades por Nombre', 14, currentY);
     currentY += 10;
@@ -71,7 +71,7 @@ const Asignaciones = () => {
       autoTable(doc, {
         head: [['ID', 'Fecha', 'Actividad', 'Usuario', 'Email']],
         body: asignacionesGrupo.map((asignacion) => [
-          asignacion.id ||'sin id',
+          asignacion.id || 'sin id',
           asignacion.fecha
             ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
             : 'Sin fecha',
@@ -89,6 +89,20 @@ const Asignaciones = () => {
   };
 
   const headers = ['ID', 'Fecha', 'Actividad', 'Usuario', 'Email'];
+
+  // Preparar los datos para la tabla, incluso si está vacía
+  const tablaData = Array.isArray(asignaciones) && asignaciones.length > 0
+    ? asignaciones.map((asignacion) => ({
+        id: asignacion.id_asignacion_actividad || 'sin id',
+        fecha: asignacion.fecha
+          ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
+          : 'Sin fecha',
+        actividad: asignacion.actividad?.nombre_actividad || 'Sin actividad',
+        usuario: asignacion.user?.nombre || 'Sin usuario',
+        email: asignacion.user?.email || 'Sin email',
+        original: asignacion,
+      }))
+    : [];
 
   return (
     <div className="overflow-x-auto rounded-lg p-4">
@@ -111,29 +125,18 @@ const Asignaciones = () => {
         </div>
       )}
 
-      {!isLoading && !error && (!Array.isArray(asignaciones) || asignaciones.length === 0) && (
-        <div className="text-center text-gray-500">No hay asignaciones registradas.</div>
-      )}
+      <Tabla
+        title="Lista de Asignaciones"
+        headers={headers}
+        data={tablaData}
+        onClickAction={(row) => openModalHandler(row.original)}
+        onUpdate={handleUpdate}
+        onCreate={handleCreate}
+        createButtonTitle="Crear"
+      />
 
-      {Array.isArray(asignaciones) && asignaciones.length > 0 && (
-        <Tabla
-          title="Lista de Asignaciones"
-          headers={headers}
-          data={asignaciones.map((asignacion) => ({
-            id: asignacion.id_asignacion_actividad || 'sin id',
-            fecha: asignacion.fecha
-              ? new Date(asignacion.fecha).toLocaleDateString('es-ES')
-              : 'Sin fecha',
-            actividad: asignacion.actividad?.nombre_actividad || 'Sin actividad',
-            usuario: asignacion.user?.nombre || 'Sin usuario',
-            email: asignacion.user?.email || 'Sin email',
-            original: asignacion, // Objeto original para acciones
-          }))}
-          onClickAction={(row) => openModalHandler(row.original)}
-          onUpdate={handleUpdate}
-          onCreate={handleCreate}
-          createButtonTitle="Crear"
-        />
+      {(!isLoading && !error && tablaData.length === 0) && (
+        <div className="text-center text-gray-500 mt-4">No hay asignaciones registradas.</div>
       )}
 
       {selectedAsignacion && (

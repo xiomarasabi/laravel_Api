@@ -1,5 +1,5 @@
 import { useCrearControlFitosanitario } from '@/hooks/trazabilidad/control/useCrearControlFitosanitario';
-import { useControlFitosanitario } from '@/hooks/trazabilidad/control/useControlFitosanitario';
+import { useDesarrollan } from '@/hooks/trazabilidad/control/useDesarrollan';
 import Formulario from '@/components/globales/Formulario';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -9,23 +9,19 @@ const CrearControlFitosanitario = () => {
   const navigate = useNavigate();
   const [errorMensaje, setErrorMensaje] = useState('');
 
-  // Obtener lista de controles fitosanitarios
-  const { data: controles = [], isLoading: isLoadingControles } = useControlFitosanitario();
+  // ✅ Usamos el hook correcto
+  const { data: desarrollanList = [], isLoading: isLoadingDesarrollan } = useDesarrollan();
 
-  // Extraer opciones únicas para el select de desarrollan
-  const desarrollanOptions = Array.from(
-    new Map(
-      controles.map((control) => {
-        const desarrollan = control.desarrollan;
-        const nombrePea = desarrollan?.pea?.nombre || '';
-        const nombreCultivo = desarrollan?.cultivo?.nombre_cultivo || '';
-        const label = nombreCultivo && nombrePea ? `${nombreCultivo} - ${nombrePea}` : nombreCultivo || nombrePea || `Desarrollan ID: ${desarrollan?.id}`;
-        return [desarrollan?.id, { value: desarrollan?.id, label }];
-      })
-    ).values()
-  );
+  // Generar opciones para el select
+  const desarrollanOptions = desarrollanList.map((d) => {
+    const nombrePea = d.pea?.nombre || 'Sin PEA';
+    const nombreCultivo = d.cultivo?.nombre_cultivo || 'Sin Cultivo';
+    return {
+      value: d.id,
+      label: `${nombreCultivo} - ${nombrePea}`,
+    };
+  });
 
-  // Campos del formulario
   const formFields = [
     { id: 'fecha_control', label: 'Fecha de Control', type: 'date' },
     { id: 'descripcion', label: 'Descripción', type: 'text' },
@@ -49,21 +45,18 @@ const CrearControlFitosanitario = () => {
       fk_id_desarrollan: parseInt(formData.fk_id_desarrollan, 10),
     };
 
-    console.log('🚀 Enviando Control Fitosanitario al backend:', nuevoControl);
-
     mutation.mutate(nuevoControl, {
       onSuccess: () => {
-        console.log('✅ Control Fitosanitario creado exitosamente.');
         navigate('/control-fitosanitario');
       },
       onError: (error: any) => {
-        console.error('❌ Error al crear Control Fitosanitario:', error?.response?.data || error.message);
         setErrorMensaje('Ocurrió un error al registrar el control.');
+        console.error('Error al crear control:', error?.response?.data || error.message);
       },
     });
   };
 
-  if (isLoadingControles) {
+  if (isLoadingDesarrollan) {
     return <div className="text-center text-gray-500">Cargando desarrollan...</div>;
   }
 
