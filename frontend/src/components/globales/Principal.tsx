@@ -21,7 +21,7 @@ const menuItems = [
     name: "Cultivo",
     icon: <Leaf size={18} />,
     submenu: [
-      { name: "Ubicacion", path: "/ubicacion" },
+      { name: "Ubicacion", path: "/ubicaciones  " },
       { name: "Eras", path: "/eras" },
       { name: "Lotes", path: "/lotes" },
       { name: "Cultivos", path: "/cultivo" },

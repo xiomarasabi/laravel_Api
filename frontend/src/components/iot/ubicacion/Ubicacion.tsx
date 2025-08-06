@@ -42,7 +42,7 @@ const UbicacionesComponent = () => {
     doc.text('Lista de Ubicaciones', 14, 15);
 
     const tableData = mappedUbicaciones.map((ubicacion) => [
-      ubicacion.id_ubicacion,
+      ubicacion.id,
       ubicacion.latitud,
       ubicacion.longitud,
     ]);
@@ -69,7 +69,7 @@ const UbicacionesComponent = () => {
   const ubicacionesList = Array.isArray(ubicaciones) ? ubicaciones : [];
 
   const mappedUbicaciones = ubicacionesList.map((ubicacion) => ({
-    id_ubicacion: ubicacion.id_ubicacion,
+    id: ubicacion.id_ubicacion,
     latitud: ubicacion.latitud.toFixed(8), // Formatear para mejor legibilidad
     longitud: ubicacion.longitud.toFixed(8),
   }));

@@ -24,6 +24,7 @@ use App\Http\Controllers\ControlFitosanitarioController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProgramacionController;
 use App\Http\Controllers\RealizaController;
+use App\Http\Controllers\SensorController;
 use App\Http\Controllers\GeneraController;
 
 Route::prefix('produccion')->group(function () {
