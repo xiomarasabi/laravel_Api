@@ -20,6 +20,7 @@ use App\Http\Controllers\ControlFitosanitarioController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ProgramacionController;
 use App\Http\Controllers\RealizaController;
+use App\Http\Controllers\GeneraController;
 
 Route::prefix('produccion')->group(function () {
     Route::get('reporte', [ProduccionController::class, 'getReporteProduccion']);
@@ -31,7 +32,8 @@ Route::prefix('ventas')->group(function () {
     Route::get('reporte_mes', [VentaController::class, 'getReporteVentasPorMes']);
 });
 Route::apiResource('ventas', VentaController::class);
-
+Route::get('generas', [GeneraController::class, 'index']);
+Route::post('generas', [GeneraController::class, 'store']);
 Route::apiResource('insumos', InsumoController::class);
 Route::apiResource('herramientas', HerramientaController::class);
 
