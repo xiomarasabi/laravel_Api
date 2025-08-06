@@ -1,0 +1,123 @@
+-- tipo_cultivos
+INSERT INTO tipo_cultivos (nombre, descripcion) VALUES
+('Hortaliza', 'Cultivos de hortalizas como tomate y lechuga'),
+('Frutal', 'Cultivos frutales como mango o papaya');
+
+-- especies
+INSERT INTO especies (nombre_comun, nombre_cientifico, descripcion, fk_id_tipo_cultivo) VALUES
+('Tomate', 'Solanum lycopersicum', 'Planta de fruto comestible', 1),
+('Lechuga', 'Lactuca sativa', 'Hortaliza de hojas verdes', 1);
+
+-- semilleros
+INSERT INTO semilleros (nombre_semilla, fecha_siembra, fecha_estimada, cantidad) VALUES
+('Semillero A', '2025-08-01', '2025-08-15', 100),
+('Semillero B', '2025-08-01', '2025-08-18', 80);
+
+-- ubicaciones
+INSERT INTO ubicaciones (latitud, longitud) VALUES
+('5.070275', '-75.513817'),
+('5.071111', '-75.512345');
+
+-- lotes
+INSERT INTO lotes (dimension, nombre_lote, fk_id_ubicacion, estado) VALUES
+(200, 'Lote A', 1, 'activo'),
+(300, 'Lote B', 2, 'activo');
+
+-- eras
+INSERT INTO eras (descripcion, fk_id_lote, estado) VALUES
+('Era 1', 1, 'activo'),
+('Era 2', 2, 'activo');
+
+-- sensores
+INSERT INTO sensores (nombre_sensor, tipo_sensor, unidad_medida, descripcion, medida_minima, medida_maxima, created_at, updated_at) VALUES
+('Sensor Temp', 'Temperatura', '°C', 'Sensor para medir temperatura', 0, 50, NOW(), NOW()),
+('Sensor Hum', 'Humedad', '%', 'Sensor para medir humedad', 10, 90, NOW(), NOW());
+
+-- tipo_residuos
+INSERT INTO tipo_residuos (nombre_residuo, descripcion) VALUES
+('Orgánico', 'Residuos de origen vegetal'),
+('Plástico', 'Desechos plásticos');
+
+-- rols
+INSERT INTO rols (nombre_rol, fecha_creacion, created_at, updated_at) VALUES
+('Administrador', '2025-08-01', NOW(), NOW()),
+('Agrónomo', '2025-08-01', NOW(), NOW());
+
+-- usuarios
+INSERT INTO usuarios (identificacion, nombre, password, email, created_at, updated_at, fk_id_rol) VALUES
+('1015', 'Carlos Ruiz', 'clave123', 'pkjpnkkn@example.com', NOW(), NOW(), 1),
+('1016', 'Laura Pérez', 'clave456', 'lljjjjjmml@example.com', NOW(), NOW(), 2);
+
+-- peas
+INSERT INTO peas (nombre, descripcion) VALUES
+('Programa A', 'Programa de Educación Ambiental A');
+
+-- cultivos
+INSERT INTO cultivos (fecha_plantacion, nombre_cultivo, descripcion, fk_id_especie, fk_id_semillero) VALUES
+('2025-08-01', 'Tomate Roma', 'Cultivo de tomate roma', 1, 1),
+('2025-08-02', 'Lechuga Batavia', 'Cultivo de lechuga batavia', 2, 2);
+
+-- desarrollan
+INSERT INTO desarrollan (fk_id_cultivo, fk_id_pea) VALUES
+(1, 1),
+(2, 1);
+
+-- herramientas
+INSERT INTO herramientas (nombre, cantidad, estado, precio) VALUES
+('Pala', 10, 'Disponible', 15000);
+
+-- insumos
+INSERT INTO insumos (nombre, tipo, cantidad, fecha_vencimiento, precio_unidad, unidad_medida) VALUES
+('Fertilizante A', 'Fertilizante', 20, '2026-01-01', 5000, 'kg'),
+('Plaguicida B', 'Plaguicida', 15, '2025-12-01', 8000, 'litro');
+
+-- actividad
+INSERT INTO actividad (nombre_actividad, descripcion, created_at, updated_at) VALUES
+('Riego', 'Actividad de riego programado', NOW(), NOW()),
+('Fertilización', 'Aplicación de fertilizantes', NOW(), NOW());
+
+-- asignacion_actividades
+INSERT INTO asignacion_actividades (fecha, fk_id_actividad, fk_identificacion, created_at, updated_at) VALUES
+('2025-08-03', 1, '1010', NOW(), NOW()),
+('2025-08-04', 2, '1011', NOW(), NOW());
+
+
+-- plantacions
+INSERT INTO plantacions (fk_id_cultivo, fk_id_era) VALUES
+(1, 1),
+(2, 2);
+
+-- realiza
+INSERT INTO realiza (fk_id_cultivo, fk_id_actividad, created_at, updated_at) VALUES
+(1, 1, NOW(), NOW()),
+(2, 2, NOW(), NOW());
+
+-- control_fitosanitario
+INSERT INTO control_fitosanitario (fecha_control, descripcion, fk_id_desarrollan) VALUES
+('2025-08-05', 'Aplicación preventiva contra plagas', 1),
+('2025-08-06', 'Revisión de hongos en hojas', 2);
+
+-- detalles
+INSERT INTO detalles (fk_cultivo, fk_sensores, created_at, updated_at) VALUES
+(1, 1, NOW(), NOW()),
+(2, 2, NOW(), NOW());
+
+-- mide
+INSERT INTO mide (fk_id_sensor, fk_id_era, valor_medicion, fecha_medicion, created_at, updated_at) VALUES
+(1, 1, 26.5, '2025-08-03 08:00:00', NOW(), NOW()),
+(2, 2, 75.0, '2025-08-03 08:00:00', NOW(), NOW());
+
+-- produccion
+INSERT INTO produccion (cantidad_producida, nombre_produccion, fecha_produccion, fk_id_lote, fk_id_cultivo, descripcion_produccion, estado, fecha_cosecha) VALUES
+(120, 'Tomates cosechados', '2025-08-10', 1, 1, 'Producción temprana de tomate', 'completo', '2025-08-10'),
+(200, 'Lechugas cosechadas', '2025-08-12', 2, 2, 'Producción estacional de lechuga', 'completo', '2025-08-12');
+
+-- venta
+INSERT INTO venta (fk_id_produccion, cantidad, precio_unitario, total_venta, fecha_venta) VALUES
+(1, 100, 600, 60000, '2025-08-13'),
+(2, 150, 400, 60000, '2025-08-14');
+
+-- residuos
+INSERT INTO residuos (nombre, fecha, descripcion, fk_id_tipo_residuo, fk_id_cultivo) VALUES
+('Desecho vegetal', '2025-08-05', 'Restos de poda', 1, 1),
+('Envases plaguicida', '2025-08-06', 'Botellas vacías', 2, 2);

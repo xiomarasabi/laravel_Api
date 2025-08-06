@@ -60,8 +60,8 @@ const CrearCultivo = () => {
           }),
         ]);
 
-        console.log('Especies cargadas:', especiesData); // Debug
-        console.log('Semilleros cargados:', semillerosData); // Debug
+        console.log('Especies cargadas:', especiesData);
+        console.log('Semilleros cargados:', semillerosData);
 
         setEspecies(especiesData);
         setSemilleros(semillerosData);
@@ -71,7 +71,7 @@ const CrearCultivo = () => {
         } else if (especiesData.length === 0) {
           setDataError('No se encontraron especies. Verifica el endpoint /especies.');
         } else if (semillerosData.length === 0) {
-          setDataError('No se encontraron semilleros. Verifica el endpoint /semilleros.');
+          setDataError('No se encontraron semilleros. Verifica el endpoint /semilleros o registra nuevos semilleros.');
         } else {
           setDataError(null);
         }
@@ -108,7 +108,7 @@ const CrearCultivo = () => {
       label: 'Descripción',
       type: 'textarea',
       placeholder: 'Descripción del cultivo...',
-      required: false, // Ajustado porque es nullable en el backend
+      required: false,
       error: formErrors.descripcion,
     },
     {
@@ -117,7 +117,7 @@ const CrearCultivo = () => {
       type: 'select',
       options: especies.length > 0
         ? [
-            { value: '', label: 'Seleccione una especie...' },
+            { value: '', label: '' },
             ...especies.map(e => ({
               value: e.id.toString(),
               label: `${e.nombre_comun || 'Sin nombre'} (${e.nombre_cientifico || 'Sin nombre científico'})`,
@@ -133,13 +133,13 @@ const CrearCultivo = () => {
       type: 'select',
       options: semilleros.length > 0
         ? [
-            { value: '', label: 'Seleccione un semillero...' },
+            { value: '', label: '' },
             ...semilleros.map(s => ({
               value: s.id.toString(),
               label: `${s.nombre_semilla || 'Semillero sin nombre'} (Siembra: ${formatDate(s.fecha_siembra)})`,
             })),
           ]
-        : [{ value: '', label: 'No hay semilleros disponibles' }],
+        : [{ value: '', label: 'No hay semilleros disponibles. Registra uno nuevo.' }],
       required: true,
       error: formErrors.fk_id_semillero,
     },
@@ -159,19 +159,18 @@ const CrearCultivo = () => {
       isValid = false;
     }
 
-    // Descripción es opcional, no validamos si está vacía
     if (formData.descripcion && formData.descripcion.length > 255) {
       errors.descripcion = 'La descripción no debe exceder 255 caracteres';
       isValid = false;
     }
 
     if (!formData.fk_id_especie) {
-      errors.fk_id_especie = 'Seleccione una especie';
+      errors.fk_id_especie = '';
       isValid = false;
     }
 
     if (!formData.fk_id_semillero) {
-      errors.fk_id_semillero = 'Seleccione un semillero';
+      errors.fk_id_semillero = '';
       isValid = false;
     }
 
@@ -186,14 +185,16 @@ const CrearCultivo = () => {
     const cultivoData = {
       nombre_cultivo: formData.nombre_cultivo.trim(),
       fecha_plantacion: formData.fecha_plantacion,
-      descripcion: formData.descripcion.trim() || null, // Enviar null si está vacío
+      descripcion: formData.descripcion.trim() || null,
       fk_id_especie: parseInt(formData.fk_id_especie, 10),
       fk_id_semillero: parseInt(formData.fk_id_semillero, 10),
     };
 
+    console.log('Enviando cultivoData:', cultivoData);
+
     mutate(cultivoData, {
       onSuccess: () => {
-        console.log('handleSubmit: Redirigiendo a /cultivos'); // Debug
+        console.log('handleSubmit: Redirigiendo a /cultivos');
         navigate('/cultivo');
       },
       onError: (err: any) => {

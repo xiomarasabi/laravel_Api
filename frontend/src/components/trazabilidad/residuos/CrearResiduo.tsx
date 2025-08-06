@@ -35,15 +35,16 @@ const CrearResiduo = () => {
       if (!token) {
         throw new Error('No hay token disponible. Por favor, inicia sesión.');
       }
-      const { data } = await axios.get(`${apiUrl}/tipo_residuos`, {
+      const response = await axios.get(`${apiUrl}/tipo_residuos`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!data || !Array.isArray(data)) {
+      console.log('Respuesta de tipos de residuos:', response.data);
+      if (!response.data || !Array.isArray(response.data)) {
         throw new Error('Los datos de tipos de residuos no tienen el formato esperado.');
       }
-      return data.map((tipo: any) => ({
+      return response.data.map((tipo: any) => ({
         id: tipo.id,
         nombre_residuo: tipo.nombre_residuo || 'Sin nombre',
         descripcion: tipo.descripcion,
@@ -88,12 +89,12 @@ const CrearResiduo = () => {
 
   // Definir los campos del formulario
   const formFields: FormField[] = [
-    { id: 'nombre', label: 'Nombre del Residuo', type: 'text' },
-    { id: 'fecha', label: 'Fecha', type: 'date' },
+    { id: 'nombre', label: 'Nombre del Residuo*', type: 'text' },
+    { id: 'fecha', label: 'Fecha*', type: 'date' },
     { id: 'descripcion', label: 'Descripción', type: 'text' },
     {
       id: 'fk_id_cultivo',
-      label: 'Cultivo',
+      label: 'Cultivo*',
       type: 'select',
       options: cultivosUnicos.map((cultivo) => ({
         value: cultivo.id,
@@ -102,7 +103,7 @@ const CrearResiduo = () => {
     },
     {
       id: 'fk_id_tipo_residuo',
-      label: 'Tipo de Residuo',
+      label: 'Tipo de Residuo*',
       type: 'select',
       options: tiposResiduosUnicos.map((tipo) => ({
         value: tipo.id,
@@ -116,31 +117,27 @@ const CrearResiduo = () => {
     setErrorMessage(null);
 
     // Validar campos obligatorios
-    if (
-      !formData.nombre ||
-      !formData.fecha ||
-      !formData.fk_id_cultivo ||
-      !formData.fk_id_tipo_residuo
-    ) {
+    if (!formData.nombre || !formData.fecha || !formData.fk_id_cultivo || !formData.fk_id_tipo_residuo) {
       setErrorMessage('Todos los campos obligatorios deben estar completos.');
       return;
     }
 
     const nuevoResiduo: CrearResiduoInput = {
       nombre: formData.nombre,
-      fecha: formData.fecha, // Enviar formato YYYY-MM-DD
+      fecha: formData.fecha,
       descripcion: formData.descripcion || '',
       fk_id_cultivo: parseInt(formData.fk_id_cultivo),
       fk_id_tipo_residuo: parseInt(formData.fk_id_tipo_residuo),
     };
 
+    console.log('Datos enviados al crear residuo:', nuevoResiduo); // Depuración
     mutation.mutate(nuevoResiduo, {
       onSuccess: () => {
         navigate('/residuos');
       },
       onError: (error: any) => {
         setErrorMessage(
-          error.response?.data?.message || 'Error al crear el residuo. Inténtalo de nuevo.'
+          error.message || 'Error al crear el residuo. Inténtalo de nuevo.'
         );
       },
     });

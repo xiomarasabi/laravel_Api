@@ -29,19 +29,31 @@ export const useCrearResiduo = () => {
       }
 
       console.log('Enviando datos al backend:', nuevoResiduo);
-      const { data } = await axios.post(`${apiUrl}/residuos`, nuevoResiduo, {
+      const response = await axios.post(`${apiUrl}/residuos`, nuevoResiduo, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-      return data;
+
+      console.log('Respuesta del servidor:', response.status, response.data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['Residuos'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error en la mutación:', error);
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || error.message;
+        console.error('Detalles del error:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message,
+        });
+        throw new Error(`Error al crear el residuo: ${message}`);
+      }
+      throw new Error('Error desconocido al crear el residuo');
     },
   });
 };

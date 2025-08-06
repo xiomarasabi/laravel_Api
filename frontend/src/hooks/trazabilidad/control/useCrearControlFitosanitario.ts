@@ -44,14 +44,23 @@ export const useCrearControlFitosanitario = () => {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const { data } = await axios.post(`${apiUrl}/control_fitosanitario`, nuevoControl, {
+        console.log('Enviando datos a:', `${apiUrl}/control_fitosanitario`);
+        console.log('Datos enviados:', nuevoControl);
+
+        const response = await axios.post(`${apiUrl}/control_fitosanitario`, nuevoControl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        return data.control_fitosanitario; // Ajustado para devolver el objeto correcto
+
+        console.log('Respuesta del servidor:', response.status, response.data);
+        return response.data.control_fitosanitario; // Ajustado para devolver el objeto correcto
       } catch (error: any) {
-        console.error("🔥 Error en POST:", error.response?.data || error.message);
+        console.error('🔥 Error en POST:', {
+          message: error.response?.data?.message || error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
         throw error;
       }
     },

@@ -9,29 +9,17 @@ const EditarSensor = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  console.log("🔍 Accediendo a EditarSensor con ID:", id);
-
   if (!id || isNaN(Number(id))) {
-    console.error("❌ Error: ID no válido:", id);
     return <div className="text-red-500">Error: ID no válido</div>;
   }
 
   const { data: sensor, isLoading, error } = useSensorPorId(id);
   const actualizarSensor = useEditarSensor();
-  const [formData, setFormData] = useState<Sensores>({
-    id: Number(id),
-    nombre_sensor: "",
-    tipo_sensor: "",
-    unidad_medida: "",
-    descripcion: "",
-    medida_minima: 0,
-    medida_maxima: 0,
-  });
+  const [formData, setFormData] = useState<Sensores | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (sensor) {
-      console.log("🔄 Cargando datos del Sensor:", sensor);
       setFormData({
         id: Number(id),
         nombre_sensor: sensor.nombre_sensor || "",
@@ -41,17 +29,27 @@ const EditarSensor = () => {
         medida_minima: sensor.medida_minima ?? 0,
         medida_maxima: sensor.medida_maxima ?? 0,
       });
+    } else if (!isLoading && !error) {
+      setFormData({
+        id: Number(id),
+        nombre_sensor: "",
+        tipo_sensor: "",
+        unidad_medida: "",
+        descripcion: "",
+        medida_minima: 0,
+        medida_maxima: 0,
+      });
     }
-  }, [sensor, id]);
+  }, [sensor, id, isLoading, error]);
 
   const handleSubmit = (data: { [key: string]: string }) => {
-    if (!id) return;
+    if (!formData) return;
 
     const errors: string[] = [];
-    if (!data.nombre_sensor.trim()) {
+    if (!data.nombre_sensor?.trim()) {
       errors.push("El nombre del sensor es requerido.");
     }
-    if (!data.tipo_sensor.trim()) {
+    if (!data.tipo_sensor?.trim()) {
       errors.push("El tipo de sensor es requerido.");
     } else if (
       ![
@@ -65,10 +63,10 @@ const EditarSensor = () => {
     ) {
       errors.push("El tipo de sensor no es válido.");
     }
-    if (!data.unidad_medida.trim()) {
+    if (!data.unidad_medida?.trim()) {
       errors.push("La unidad de medida es requerida.");
     }
-    if (!data.descripcion.trim()) {
+    if (!data.descripcion?.trim()) {
       errors.push("La descripción es requerida.");
     }
     if (!data.medida_minima || isNaN(Number(data.medida_minima))) {
@@ -82,12 +80,11 @@ const EditarSensor = () => {
 
     if (errors.length > 0) {
       setFormError(errors.join(" "));
-      console.error("⚠️ Datos inválidos:", errors);
       return;
     }
 
     const sensorActualizado: Sensores = {
-      id: Number(id),
+      id: formData.id,
       nombre_sensor: data.nombre_sensor.trim(),
       tipo_sensor: data.tipo_sensor.trim().toUpperCase(),
       unidad_medida: data.unidad_medida.trim(),
@@ -96,32 +93,23 @@ const EditarSensor = () => {
       medida_maxima: Number(data.medida_maxima),
     };
 
-    console.log("🚀 Enviando Sensor actualizado:", sensorActualizado);
-
     actualizarSensor.mutate(sensorActualizado, {
-      onSuccess: (response) => {
-        console.log("✅ Sensor actualizado correctamente:", response);
-        setFormError(null);
+      onSuccess: () => {
         navigate("/sensores");
       },
       onError: (err: any) => {
-        const errorMessage = err.message || "Error al actualizar el sensor.";
-        setFormError(errorMessage);
-        console.error("❌ Error al actualizar:", errorMessage, err.response?.data);
+        setFormError(err.message || "Error al actualizar el sensor.");
       },
     });
   };
 
   if (isLoading) {
-    console.log("⏳ Componente en estado de carga");
     return <div className="text-gray-500">Cargando datos...</div>;
   }
   if (error) {
-    console.log("❌ Error al cargar sensor:", error);
     return <div className="text-red-500">Error al cargar el Sensor: {error.message}</div>;
   }
-  if (!sensor) {
-    console.log("⚠️ Sensor no encontrado para ID:", id);
+  if (!sensor && !formData) {
     return <div className="text-red-500">Sensor no encontrado</div>;
   }
 
@@ -159,12 +147,12 @@ const EditarSensor = () => {
           isSuccess={actualizarSensor.isSuccess}
           title="Actualizar Sensor"
           initialValues={{
-            nombre_sensor: formData.nombre_sensor,
-            tipo_sensor: formData.tipo_sensor,
-            unidad_medida: formData.unidad_medida,
-            descripcion: formData.descripcion,
-            medida_minima: formData.medida_minima.toString(),
-            medida_maxima: formData.medida_maxima.toString(),
+            nombre_sensor: formData?.nombre_sensor || "",
+            tipo_sensor: formData?.tipo_sensor || "",
+            unidad_medida: formData?.unidad_medida || "",
+            descripcion: formData?.descripcion || "",
+            medida_minima: formData?.medida_minima?.toString() || "",
+            medida_maxima: formData?.medida_maxima?.toString() || "",
           }}
           key={JSON.stringify(formData)}
         />
