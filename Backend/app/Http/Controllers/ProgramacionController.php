@@ -4,68 +4,66 @@ namespace App\Http\Controllers;
 
 use App\Models\Programacion;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ProgramacionController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
-        $programaciones = Programacion::with(['asignacionActividades', 'calendarioLunar'])->get();
-        return response()->json(['data' => $programaciones, 'message' => 'Programaciones retrieved successfully'], 200);
+        // Carga las relaciones asignacionActividad y calendarioLunar
+        $programaciones = Programacion::with(['asignacionActividad', 'calendarioLunar'])->get();
+        return response()->json($programaciones);
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'estado' => 'required|string|max:50',
+        $request->validate([
+            'estado' => 'required|in:pendiente,completado,cancelado',
             'fecha_programada' => 'required|date',
-            'duracion' => 'required|integer',
-            'fk_id_asignacion_actividad' => 'required|exists:asignacion__actividades,id_asignacion_actividad',
+            'duracion' => 'required|date_format:H:i:s',
+            'fk_id_asignacion_actividad' => 'required|exists:asignacion_actividades,id_asignacion_actividad',
             'fk_id_calendario_lunar' => 'required|exists:calendario_lunar,id_calendario_lunar',
         ]);
 
-        $programacion = Programacion::create($validated);
+        $programacion = Programacion::create($request->all());
 
-        return response()->json(['data' => $programacion, 'message' => 'Programación creada exitosamente'], 201);
+        // Carga las relaciones asignacionActividad y calendarioLunar
+        $programacion->load(['asignacionActividad', 'calendarioLunar']);
+
+        return response()->json($programacion, 201);
     }
 
-    public function put(Request $request, int $id_programacion): JsonResponse
+    public function show($id_programacion)
     {
-        $validated = $request->validate([
-            'estado' => 'required|string|max:50',
-            'fecha_programada' => 'required|date',
-            'duracion' => 'required|integer',
-            'fk_id_asignacion_actividad' => 'required|exists:asignacion__actividades,id_asignacion_actividad',
-            'fk_id_calendario_lunar' => 'required|exists:calendario_lunar,id_calendario_lunar',
-        ]);
+        // Carga las relaciones asignacionActividad y calendarioLunar
+        $programacion = Programacion::with(['asignacionActividad', 'calendarioLunar'])->findOrFail($id_programacion);
+        return response()->json($programacion);
+    }
 
+    public function update(Request $request, $id_programacion)
+    {
         $programacion = Programacion::findOrFail($id_programacion);
-        $programacion->update($validated);
 
-        return response()->json(['data' => $programacion, 'message' => 'Programación actualizada exitosamente'], 200);
-    }
-
-    public function patch(Request $request, int $id_programacion): JsonResponse
-    {
-        $validated = $request->validate([
-            'estado' => 'required|string|max:50',
-            'fecha_programada' => 'required|date',
-            'duracion' => 'required|integer',
-            'fk_id_asignacion_actividad' => 'required|exists:asignacion__actividades,id_asignacion_actividad',
-            'fk_id_calendario_lunar' => 'required|exists:calendario_lunar,id_calendario_lunar',
+        $request->validate([
+            'estado' => 'sometimes|in:pendiente,completado,cancelado',
+            'fecha_programada' => 'sometimes|date',
+            'duracion' => 'sometimes|date_format:H:i:s',
+            'fk_id_asignacion_actividad' => 'sometimes|exists:asignacion_actividades,id_asignacion_actividad',
+            'fk_id_calendario_lunar' => 'sometimes|exists:calendario_lunar,id_calendario_lunar',
         ]);
 
-        $programacion = Programacion::findOrFail($id_programacion);
-        $programacion->update($validated);
+        $programacion->update($request->all());
 
-        return response()->json(['data' => $programacion, 'message' => 'Programación actualizada exitosamente'], 200);
+        // Carga las relaciones asignacionActividad y calendarioLunar
+        $programacion->load(['asignacionActividad', 'calendarioLunar']);
+
+        return response()->json($programacion);
     }
 
-    public function delete(int $id_programacion): JsonResponse
+    public function destroy($id_programacion)
     {
         $programacion = Programacion::findOrFail($id_programacion);
         $programacion->delete();
 
-        return response()->json(['message' => 'Programación eliminada exitosamente'], 200);
+        return response()->json(['message' => 'Programación eliminada correctamente'], 200);
     }
 }

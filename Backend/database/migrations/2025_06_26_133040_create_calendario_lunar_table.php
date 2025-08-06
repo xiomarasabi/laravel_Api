@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('calendario_lunar', function (Blueprint $table) {
             $table->id('id_calendario_lunar');
-            $table->date('fecha')->nullable(false);
-            $table->text('descripcion_evento')->nullable(false);
-            $table->string('evento', 255)->nullable(false);
-            $table->timestamps();
+            $table->date('fecha');
+            $table->text('descripcion_evento');
+            $table->string('evento', 255);
         });
+        
     }
 
     /**

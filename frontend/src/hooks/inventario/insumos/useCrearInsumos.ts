@@ -17,17 +17,17 @@ export const useCrearInsumos = () => {
 
     return useMutation({
         mutationFn: async (nuevoHerramienta: Insumo) => {
-            // const token = localStorage.getItem("token");
-            //if (!token) {
-            //    throw new Error("No se ha encontrado un token de autenticación");
-            //}
+            const token = localStorage.getItem("token");
+            if (!token) {
+                throw new Error("No se ha encontrado un token de autenticación");
+            }
             const data  = await axios.post(
                 `${apiUrl}insumos/`,
                 nuevoHerramienta,
                 {
-                    //headers: {
-                    //    Authorization: `Bearer ${token}`,
-                    //},
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
             return data;

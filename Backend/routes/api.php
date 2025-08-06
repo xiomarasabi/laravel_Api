@@ -1,4 +1,8 @@
 <?php
+
+use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\AsignacionActividadesController;
+use App\Http\Controllers\CalendarioLunarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HerramientaController;
 use App\Http\Controllers\InsumoController;
@@ -36,7 +40,6 @@ Route::get('generas', [GeneraController::class, 'index']);
 Route::post('generas', [GeneraController::class, 'store']);
 Route::apiResource('insumos', InsumoController::class);
 Route::apiResource('herramientas', HerramientaController::class);
-
 Route::apiResource('cultivos', CultivoController::class);
 Route::apiResource('ubicaciones', UbicacionController::class);
 Route::apiResource('lotes', LoteController::class);
@@ -50,11 +53,19 @@ Route::apiResource('residuos', ResiduoController::class);
 Route::apiResource('peas', PeaController::class);
 Route::apiResource('desarrollan', DesarrollanController::class);
 Route::apiResource('control_fitosanitario', ControlFitosanitarioController::class);
+Route::apiResource('sensores', SensorController::class);
+
+Route::apiResource('actividad', ActividadController::class);
+Route::apiResource('calendario_lunar', CalendarioLunarController::class);
+Route::apiResource('asignacion_actividades', AsignacionActividadesController::class);
+Route::apiResource('programacion', ProgramacionController::class);
+Route::apiResource('notificacion', NotificacionController::class);
+Route::apiResource('realiza', RealizaController::class);
+
 
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AuthController;
-
 
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -85,5 +96,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('peas', PeaController::class);
     Route::apiResource('desarrollan', DesarrollanController::class);
     Route::apiResource('control_fitosanitario', ControlFitosanitarioController::class);
+    Route::apiResource('actividad', ActividadController::class);
+    Route::apiResource('calendario_lunar', CalendarioLunarController::class);
+    Route::apiResource('asignacion_actividades', AsignacionActividadesController::class);
+    Route::apiResource('programacion', ProgramacionController::class);
+    Route::apiResource('notificacion', NotificacionController::class);
+    Route::apiResource('realiza', RealizaController::class);
+
 });
 

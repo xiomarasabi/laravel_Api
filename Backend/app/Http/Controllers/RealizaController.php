@@ -4,59 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Realiza;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class RealizaController extends Controller
 {
-    public function get(): JsonResponse
+    public function index()
     {
+        // Carga las relaciones cultivo y actividad
         $realiza = Realiza::with(['cultivo', 'actividad'])->get();
-        return response()->json(['data' => $realiza, 'message' => 'Realizaciones retrieved successfully'], 200);
+        return response()->json($realiza);
     }
 
-    public function post(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'fk_id_cultivo' => 'required|exists:cultivo,id_cultivo',
+        $request->validate([
+            'fk_id_cultivo' => 'required|exists:cultivo,id',
             'fk_id_actividad' => 'required|exists:actividad,id_actividad',
         ]);
 
-        $realiza = Realiza::create($validated);
+        $realiza = Realiza::create($request->all());
 
-        return response()->json(['data' => $realiza, 'message' => 'Realización creada exitosamente'], 201);
+        // Carga las relaciones cultivo y actividad
+        $realiza->load(['cultivo', 'actividad']);
+
+        return response()->json($realiza, 201);
     }
 
-    public function put(Request $request, int $id_realiza): JsonResponse
+    public function show($id_realiza)
     {
-        $validated = $request->validate([
-            'fk_id_cultivo' => 'required|exists:cultivo,id_cultivo',
-            'fk_id_actividad' => 'required|exists:actividad,id_actividad',
-        ]);
+        // Carga las relaciones cultivo y actividad
+        $realiza = Realiza::with(['cultivo', 'actividad'])->findOrFail($id_realiza);
+        return response()->json($realiza);
+    }
 
+    public function update(Request $request, $id_realiza)
+    {
         $realiza = Realiza::findOrFail($id_realiza);
-        $realiza->update($validated);
 
-        return response()->json(['data' => $realiza, 'message' => 'Realización actualizada exitosamente'], 200);
-    }
-
-    public function patch(Request $request, int $id_realiza): JsonResponse
-    {
-        $validated = $request->validate([
-            'fk_id_cultivo' => 'required|exists:cultivo,id_cultivo',
-            'fk_id_actividad' => 'required|exists:actividad,id_actividad',
+        $request->validate([
+            'fk_id_cultivo' => 'sometimes|exists:cultivo,id',
+            'fk_id_actividad' => 'sometimes|exists:actividad,id_actividad',
         ]);
 
-        $realiza = Realiza::findOrFail($id_realiza);
-        $realiza->update($validated);
+        $realiza->update($request->all());
 
-        return response()->json(['data' => $realiza, 'message' => 'Realización actualizada exitosamente'], 200);
+        // Carga las relaciones cultivo y actividad
+        $realiza->load(['cultivo', 'actividad']);
+
+        return response()->json($realiza);
     }
 
-    public function delete(int $id_realiza): JsonResponse
+    public function destroy($id_realiza)
     {
         $realiza = Realiza::findOrFail($id_realiza);
         $realiza->delete();
 
-        return response()->json(['message' => 'Realización eliminada exitosamente'], 200);
+        return response()->json(['message' => 'Relación eliminada correctamente'], 200);
     }
 }

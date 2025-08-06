@@ -1,4 +1,3 @@
-// src/hooks/iot/eras/useEditarEras.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -6,9 +5,10 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export interface Eras {
   id: number;
-  fk_id_lote: number;
+  fk_id_lote: number; 
   descripcion: string;
   estado: string;
+  lote_nombre?: string; 
 }
 
 export const useEditarEras = () => {
@@ -29,7 +29,7 @@ export const useEditarEras = () => {
         if (!token) {
           throw new Error('No se ha encontrado un token de autenticación');
         }
-        const { data } = await axios.put(`${apiUrl}eras/${id}/`, datos, {
+        const { data } = await axios.put(`${apiUrl}eras/${id}`, datos, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

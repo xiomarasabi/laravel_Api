@@ -1,4 +1,3 @@
-// src/pages/iot/IotPage.tsx (o Sensores.tsx según tu estructura)
 import { useState } from 'react';
 import { useSensores, Sensor } from '../../../hooks/iot/sensores/useSensores';
 import Tabla from '../../globales/Tabla';
@@ -9,13 +8,12 @@ import autoTable from 'jspdf-autotable';
 
 interface TableRow {
   id: number;
-  nombre: string;
-  tipo: string;
-  unidad: string;
+  nombre_sensor: string;
+  tipo_sensor: string;
+  unidad_medida: string;
   descripcion: string;
-  minimo: number;
-  maximo: number;
-  evapotranspiracion: string;
+  medida_minima: number;
+  medida_maxima: number;
 }
 
 const Sensores = () => {
@@ -35,15 +33,19 @@ const Sensores = () => {
   };
 
   const handleUpdate = (sensor: { id: number }) => {
-    navigate(`/iot/editar-sensor/${sensor.id}`);
+    if (!sensor.id || isNaN(sensor.id)) {
+      console.error('ID no válido para edición');
+      return;
+    }
+    navigate(`/editar-sensor/${sensor.id}`);
   };
 
-  const headers = [ 'Nombre', 'Tipo', 'Unidad', 'Descripcion', 'Minimo', 'Maximo','Evapotranspiracion'];
+  const headers = ['Nombre sensor', 'Tipo sensor', 'Unidad medida', 'Descripcion', 'medida Minima', 'medida Maxima'];
 
   const handleRowClick = (row: TableRow) => {
-    const originalSensor = sensores.find((s) => s.id_sensor === row.id);
-    if (originalSensor) {
-      openModalHandler(originalSensor);
+    const sensor = sensores.find((s) => s.id === row.id);
+    if (sensor) {
+      openModalHandler(sensor);
     }
   };
 
@@ -76,11 +78,10 @@ const Sensores = () => {
       item.descripcion || 'N/A',
       item.medida_minima !== undefined ? item.medida_minima : 'N/A',
       item.medida_maxima !== undefined ? item.medida_maxima : 'N/A',
-      item.evapotranspiracion ? item.evapotranspiracion.toFixed(2) : 'N/A',
     ]);
 
     autoTable(doc, {
-      head: [[ 'Nombre', 'Tipo', 'Unidad', 'Descripcion', 'Minimo', 'Maximo', 'Evapotranspiracion']],
+      head: [['#', 'Nombre', 'Tipo', 'Unidad', 'Descripción', 'Mínimo', 'Máximo']],
       body: tableData,
       startY: 20,
       margin: { horizontal: 10 },
@@ -88,12 +89,11 @@ const Sensores = () => {
       columnStyles: {
         0: { cellWidth: 10 },
         1: { cellWidth: 30 },
-        2: { cellWidth: 20 },
-        3: { cellWidth: 20 },
-        4: { cellWidth: 40 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 50 },
         5: { cellWidth: 20 },
         6: { cellWidth: 20 },
-        7: { cellWidth: 20 },
       },
     });
 
@@ -103,17 +103,15 @@ const Sensores = () => {
   if (isLoading) return <div className="text-center">Cargando sensores...</div>;
   if (error) return <div className="text-red-600 text-center">Error al cargar los sensores: {error.message}</div>;
 
-  // Forzamos datos vacíos si no hay sensores para evitar el mensaje "No se encontraron resultados"
-  const mappedSensores = sensores.length > 0 ? sensores.map((sensor) => ({
-    id: sensor.id_sensor,
-    nombre: sensor.nombre_sensor,
-    tipo: sensor.tipo_sensor,
-    unidad: sensor.unidad_medida,
-    descripcion: sensor.descripcion,
-    minimo: sensor.medida_minima,
-    maximo: sensor.medida_maxima,
-    evapotranspiracion: sensor.evapotranspiracion ? sensor.evapotranspiracion.toFixed(2) : 'N/A',
-  })) : [{ id: 0, nombre: '', tipo: '', unidad: '', descripcion: '', minimo: 0, maximo: 0, evapotranspiracion: '' }];
+  const mappedSensores: TableRow[] = sensores.map((sensor) => ({
+    id: sensor.id,
+    nombre_sensor: sensor.nombre_sensor || 'Sin nombre',
+    tipo_sensor: sensor.tipo_sensor || 'Sin tipo',
+    unidad_medida: sensor.unidad_medida || 'Sin unidad',
+    descripcion: sensor.descripcion || 'Sin descripción',
+    medida_minima: sensor.medida_minima !== undefined ? sensor.medida_minima : 0,
+    medida_maxima: sensor.medida_maxima !== undefined ? sensor.medida_maxima : 0,
+  }));
 
   return (
     <div className="overflow-x-auto rounded-lg p-4">
@@ -141,14 +139,13 @@ const Sensores = () => {
           onClose={closeModal}
           titulo="Detalles del Sensor"
           contenido={{
-            ID: selectedSensor.id_sensor,
+            ID: selectedSensor.id,
             Nombre: selectedSensor.nombre_sensor,
             Tipo: selectedSensor.tipo_sensor,
             Unidad: selectedSensor.unidad_medida,
-            Descripción: selectedSensor.descripcion,
+            Descripción: selectedSensor.descripcion || 'Sin descripción',
             Mínimo: selectedSensor.medida_minima,
             Máximo: selectedSensor.medida_maxima,
-            Evapotranspiración: selectedSensor.evapotranspiracion ? selectedSensor.evapotranspiracion.toFixed(2) : 'N/A',
           }}
         />
       )}

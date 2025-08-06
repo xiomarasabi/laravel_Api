@@ -19,4 +19,9 @@ class Semillero extends Model
     ];
 
     public $timestamps = false;
+
+    public function cultivos()
+    {
+        return $this->hasMany(Cultivo::class, 'fk_id_semillero');
+    }
 }

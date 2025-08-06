@@ -1,70 +1,81 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-// URL base de la API
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
 
-// Interfaces basadas en la tabla asignacion_actividad y la respuesta del backend
 export interface Asignacion {
-  id: number;
-  fecha: string; // Fecha en formato ISO
-  fk_id_actividad: Actividad;
+  id_asignacion_actividad: number;
+  fecha: string;
+  fk_id_actividad: number;
+  fk_identificacion: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+  actividad?: {
+    id_actividad: number;
+    nombre_actividad: string;
+    descripcion: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+  } | null;
+  user?: {
+    identificacion: number;
+    nombre: string;
+    email: string;
+    telefono?: string | null;
+    fk_id_rol?: {
+      id_rol: number;
+      nombre_rol: string;
+      fecha_creacion?: string | null;
+    } | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+  } | null;
 }
 
-export interface Actividad {
-  id: number;
-  nombre_actividad: string;
-  descripcion: string;
-  fk_identificacion: Usuario;
-}
-
-export interface Usuario {
-  id: string; // VARCHAR(20) en la tabla usuarios
-  nombre: string;
-  email: string;
-  fk_id_rol: Rol;
-}
-
-export interface Rol {
-  id: number;
-  nombre_rol: string;
-  fecha_creacion: string;
-}
-
-// Función para obtener asignaciones
-const fetchAsignaciones = async (): Promise<Asignacion[]> => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    throw new Error('No hay token de autenticación');
-  }
-
-  try {
-    const response = await axios.get(`${apiUrl}asignacion_actividad/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Validamos que los datos devueltos sean un array
-    if (!Array.isArray(response.data.asignacion_actividad)) {
-      throw new Error('La API no devolvió un array válido.');
-    }
-
-    console.log('Datos recibidos de la API:', response.data);
-
-    return response.data.asignacion_actividad;
-  } catch (error: any) {
-    console.error('Error al obtener asignaciones de actividades:', error.response || error.message);
-    throw new Error(
-      error.response?.data?.msg || 'No se pudo obtener la lista de las actividades asignadas'
-    );
-  }
-};
-
-// Hook para consumir las asignaciones
 export const useAsignacion = () => {
   return useQuery<Asignacion[], Error>({
     queryKey: ['asignaciones'],
-    queryFn: fetchAsignaciones,
-    staleTime: 1000 * 60 * 10, // Los datos se consideran frescos por 10 minutos
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('❌ Error: Token de autenticación no encontrado');
+        throw new Error('Token de autenticación no encontrado');
+      }
+
+      try {
+        const response = await axios.get(`${apiUrl}/asignacion_actividades`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        const asignaciones = response.data;
+
+        // Validar que cada asignación tenga id_asignacion_actividad
+        asignaciones.forEach((asignacion: Asignacion, index: number) => {
+          if (!asignacion.id_asignacion_actividad) {
+            console.warn(`⚠️ Asignación en índice ${index} no tiene id_asignacion_actividad:`, asignacion);
+          }
+        });
+
+        console.log('✅ Datos de asignaciones obtenidos:', asignaciones);
+        return asignaciones;
+      } catch (error: any) {
+        console.error('❌ Error al obtener asignaciones:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        throw new Error(
+          error.response?.data?.message || 'Error al obtener las asignaciones'
+        );
+      }
+    },
+    retry: (failureCount, error) => {
+      if (error.message.includes('Token')) {
+        return false; // No reintentar si falta el token
+      }
+      return failureCount < 2; // Reintentar hasta 2 veces para otros errores
+    },
   });
 };

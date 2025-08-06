@@ -3,33 +3,12 @@ import axios, { AxiosError } from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:3000';
 
-export interface Ubicacion {
-  id: number;
-  latitud: string;
-  longitud: string;
-}
-
 export interface Lote {
   id: number;
   dimension: string;
   nombre_lote: string;
-  fk_id_ubicacion: number;
+  nombre_ubicacion: string; // Cambiado de fk_id_ubicacion a nombre_ubicacion
   estado: string;
-}
-
-interface ApiResponse {
-  msg: string;
-  lote: {
-    id: number;
-    dimension: string;
-    nombre_lote: string;
-    fk_id_ubicacion: {
-      id: number;
-      latitud: string;
-      longitud: string;
-    };
-    estado: string;
-  };
 }
 
 export const useLotePorId = (id: string | undefined) => {
@@ -47,7 +26,6 @@ export const useLotePorId = (id: string | undefined) => {
         throw new Error('No se ha encontrado un token de autenticación');
       }
 
-      // Asegurar la barra correcta en la URL
       const url = `${apiUrl}/lotes/${id}`;
       console.log('📋 Enviando solicitud GET a:', url);
 
@@ -59,7 +37,7 @@ export const useLotePorId = (id: string | undefined) => {
       }
 
       try {
-        const { data } = await axios.get<ApiResponse>(url, {
+        const { data } = await axios.get<Lote>(url, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -68,16 +46,12 @@ export const useLotePorId = (id: string | undefined) => {
 
         console.log('📋 Datos del lote obtenidos:', data);
 
-        if (!data.lote) {
-          throw new Error('Lote no encontrado');
-        }
-
         return {
-          id: data.lote.id,
-          dimension: data.lote.dimension,
-          nombre_lote: data.lote.nombre_lote,
-          fk_id_ubicacion: data.lote.fk_id_ubicacion.id,
-          estado: data.lote.estado,
+          id: data.id,
+          dimension: data.dimension,
+          nombre_lote: data.nombre_lote,
+          nombre_ubicacion: data.nombre_ubicacion,
+          estado: data.estado,
         };
       } catch (error) {
         const err = error as AxiosError<{ msg: string }>;

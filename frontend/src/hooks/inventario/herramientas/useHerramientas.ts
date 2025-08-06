@@ -13,15 +13,15 @@ export interface Herramientas {
 
 const fetchHerramientas = async (): Promise<Herramientas[]> => {
     try {
-        //const token = localStorage.getItem('token');
-        //if (!token) {
-        //    throw new Error('No se encontró el token de autenticación');
-        //}
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
 
         const { data } = await axios.get(`${apiUrl}herramientas/`, {
-            //headers: {
-            //    Authorization: `Bearer ${token}`,
-            //},
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
         return data;
     } catch (error) {

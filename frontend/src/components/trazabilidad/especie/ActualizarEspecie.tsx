@@ -60,7 +60,7 @@ const ActualizarEspecie = () => {
                     { id: "nombre_comun", label: "Nombre común", type: "text" },
                     { id: "nombre_cientifico", label: "Nombre científico", type: "text" },
                     { id: "descripcion", label: "Descripción", type: "text" },
-                    { id: "fk_id_tipo_cultivo", label: "ID Tipo de Cultivo (opcional)", type: "number" },
+                    { id: "fk_id_tipo_cultivo", label: "ID Tipo de Cultivo", type: "number" },
                 ]}
             />
         </div>

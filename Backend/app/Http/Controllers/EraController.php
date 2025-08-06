@@ -8,10 +8,16 @@ use Illuminate\Http\Request;
 class EraController extends Controller
 {
     public function index()
-    {
-        $eras = Era::all();
+{
+    try {
+        $eras = Era::select('eras.id', 'eras.descripcion', 'eras.estado', 'lotes.nombre_lote as nombre')
+            ->leftJoin('lotes', 'eras.fk_id_lote', '=', 'lotes.id')
+            ->get();
         return response()->json($eras);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al obtener las eras: ' . $e->getMessage()], 500);
     }
+}
 
     public function store(Request $request)
     {
@@ -35,7 +41,10 @@ class EraController extends Controller
 
     public function show($id)
     {
-        $era = Era::findOrFail($id);
+        $era = Era::select('eras.id', 'eras.descripcion', 'eras.estado', 'lotes.nombre_lote as lote_nombre')
+            ->leftJoin('lotes', 'eras.fk_id_lote', '=', 'lotes.id')
+            ->where('eras.id', $id)
+            ->firstOrFail();
         return response()->json($era);
     }
 
