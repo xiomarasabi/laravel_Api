@@ -45,6 +45,7 @@ import ActualizarControlFitosanitario from "./components/trazabilidad/control/Ac
 import CrearProduccionPage from "./pages/finanzas/produccion/CrearProduccionPage";
 import ActualizarProduccionPage from "./pages/finanzas/produccion/ActualizarProduccionPage";
 import CrearEras from "./components/iot/eras/CrearEras";
+import CrearUbicacion from "./components/iot/ubicacion/CrearUbicacion";
 import EditarEras from "./components/iot/eras/EditarEras";
 import CrearLote from "./components/iot/lotes/CrearLote";
 import EditarLote from "./components/iot/lotes/EditarLote";
@@ -65,6 +66,7 @@ import ListarInsumos from "./components/inventario/insumos/Insumos";
 import ActualizarInsumos from "./components/inventario/insumos/ActualizarInsumos";
 import GraficaProduccionPorLote from "./components/finanzas/produccion/Grafica";
 import GraficasVentas from "./components/finanzas/venta/GraficasVentas";
+import UbicacionPage from "./pages/iot/UbicacionPage";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +97,8 @@ function App() {
           <Route path="/crear-eras" element={<Principal><CrearEras /></Principal>} />
           <Route path="/EditarEras/:id" element={<Principal><EditarEras /></Principal>} />
           <Route path="/historical/:sensorId" element={<Principal><HistoricalDataPage /></Principal>} />
+          <Route path="/ubicaciones" element={<Principal><UbicacionPage /></Principal>} />
+          <Route path="/crearubicacion" element={<Principal><CrearUbicacion /></Principal>} />
           {/* Rutas módulo inventario */}
           <Route path="/herramientas" element={<Principal><HerramientasPage /></Principal>} />
           <Route path="/CrearHerramientas" element={<Principal><CrearHerramientas /></Principal>} />
