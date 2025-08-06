@@ -83,20 +83,23 @@ const ResiduosComponent = () => {
     );
   }
 
-  const mappedResiduos: ResiduoRow[] = residuos.map((residuo) => ({
-    id: residuo.id,
-    nombre: residuo.nombre || 'Sin nombre',
-    fecha: residuo.fecha
-      ? new Date(residuo.fecha).toLocaleDateString('es-CO', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
-      : 'Sin fecha',
-    descripcion: residuo.descripcion || 'Sin descripción',
-    cultivo: residuo.cultivo?.nombre_cultivo || 'Sin cultivo',
-    tipo_residuo: residuo.tipo_residuo?.nombre_residuo || 'Sin tipo', // Cambiado de 'nombre' a 'nombre_residuo'
-  }));
+  const mappedResiduos: ResiduoRow[] = residuos.map((residuo) => {
+    console.log('Mapeando residuo:', residuo); // Depuración adicional
+    return {
+      id: residuo.id,
+      nombre: residuo.nombre || 'Sin nombre',
+      fecha: residuo.fecha
+        ? new Date(residuo.fecha).toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : 'Sin fecha',
+      descripcion: residuo.descripcion || 'Sin descripción',
+      cultivo: residuo.cultivo?.nombre_cultivo || 'Sin cultivo',
+      tipo_residuo: residuo.tipo_residuo?.nombre_residuo || 'Sin tipo',
+    };
+  });
 
   const headers = ['ID', 'Nombre', 'Fecha', 'Descripcion', 'Cultivo', 'Tipo Residuo'];
 
@@ -138,7 +141,7 @@ const ResiduosComponent = () => {
               : 'Sin fecha',
             Descripción: selectedResiduo.descripcion || 'Sin descripción',
             Cultivo: selectedResiduo.cultivo?.nombre_cultivo || 'Sin cultivo',
-            'Tipo Residuo': selectedResiduo.tipo_residuo?.nombre_residuo || 'Sin tipo', // Cambiado de 'nombre' a 'nombre_residuo'
+            'Tipo Residuo': selectedResiduo.tipo_residuo?.nombre_residuo || 'Sin tipo',
           }}
         />
       )}

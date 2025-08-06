@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Especie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EspecieController extends Controller
 {
+    // Obtener todas las especies con su tipo de cultivo relacionado
     public function index()
     {
-        $especies = Especie::all();
+        $especies = Especie::with('tipoCultivo')->get();
         return response()->json($especies);
     }
 
+    // Registrar nueva especie
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +26,6 @@ class EspecieController extends Controller
             'id_tipo_cultivo' => 'required_without:fk_id_tipo_cultivo|exists:tipo_cultivos,id',
         ]);
 
-        // Prioriza fk_id_tipo_cultivo, pero usa id_tipo_cultivo si no está presente
         $tipoCultivo = $request->fk_id_tipo_cultivo ?? $request->id_tipo_cultivo;
 
         $especie = Especie::create([
@@ -33,18 +35,22 @@ class EspecieController extends Controller
             'fk_id_tipo_cultivo' => $tipoCultivo,
         ]);
 
+        $especie->load('tipoCultivo');
+
         return response()->json([
             'msg' => 'Especie registrada con éxito',
             'especie' => $especie
         ], 201);
     }
 
+    // Obtener una especie por ID con su tipo de cultivo
     public function show($id)
     {
-        $especie = Especie::findOrFail($id);
+        $especie = Especie::with('tipoCultivo')->findOrFail($id);
         return response()->json($especie);
     }
 
+    // Actualizar especie existente
     public function update(Request $request, $id)
     {
         $especie = Especie::findOrFail($id);
@@ -57,7 +63,6 @@ class EspecieController extends Controller
             'id_tipo_cultivo' => 'required_without:fk_id_tipo_cultivo|exists:tipo_cultivos,id',
         ]);
 
-        // Prioriza fk_id_tipo_cultivo, pero usa id_tipo_cultivo si no está presente
         $tipoCultivo = $request->fk_id_tipo_cultivo ?? $request->id_tipo_cultivo;
 
         $especie->update([
@@ -67,14 +72,35 @@ class EspecieController extends Controller
             'fk_id_tipo_cultivo' => $tipoCultivo ?? $especie->fk_id_tipo_cultivo,
         ]);
 
+        $especie->load('tipoCultivo');
+
         return response()->json($especie);
     }
 
+    // Eliminar especie
     public function destroy($id)
     {
         $especie = Especie::findOrFail($id);
         $especie->delete();
 
         return response()->json(['msg' => 'Especie eliminada correctamente']);
+    }
+
+    // Reporte agrupado por tipo de cultivo
+    public function reporte()
+    {
+        $reporte = DB::table('especies as e')
+            ->join('tipo_cultivos as t', 'e.fk_id_tipo_cultivo', '=', 't.id')
+            ->select(
+                't.id as id_tipo_cultivo',
+                't.nombre as tipo_cultivo',
+                DB::raw('COUNT(e.id_especie) as total_especies')
+            )
+            ->groupBy('t.id', 't.nombre')
+            ->get();
+
+        return response()->json([
+            'reporte' => $reporte
+        ]);
     }
 }

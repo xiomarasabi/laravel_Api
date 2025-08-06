@@ -41,10 +41,10 @@ class SemilleroController extends Controller
         $semillero = Semillero::findOrFail($id);
 
         $request->validate([
-            'nombre_semilla' => 'string|max:100',
-            'fecha_siembra' => 'date',
-            'fecha_estimada' => 'date|after_or_equal:fecha_siembra',
-            'cantidad' => 'integer|min:1',
+            'nombre_semilla' => 'sometimes|string|max:100',
+            'fecha_siembra' => 'sometimes|date',
+            'fecha_estimada' => 'sometimes|date|after_or_equal:fecha_siembra',
+            'cantidad' => 'sometimes|integer|min:1',
         ]);
 
         $semillero->update($request->all());
@@ -57,6 +57,26 @@ class SemilleroController extends Controller
         $semillero = Semillero::findOrFail($id);
         $semillero->delete();
 
-        return response()->json(['msg' => 'Semillero eliminado correctamente']);
+        return response()->json(['msg' => 'Semillero eliminado correctamente'], 200);
+    }
+
+    // ✅ Función de reporte para jsPDF
+    public function reporte()
+    {
+        $totalSemilleros = Semillero::count();
+        $nombres = Semillero::pluck('nombre_semilla')->toArray();
+
+        if ($totalSemilleros === 0 || empty($nombres)) {
+            return response()->json([
+                'message' => 'No se pudo generar el reporte: faltan datos.'
+            ], 400);
+        }
+
+        return response()->json([
+            'reporte' => [
+                'total_semilleros' => $totalSemilleros,
+                'nombres_semilleros' => implode(', ', $nombres),
+            ]
+        ]);
     }
 }

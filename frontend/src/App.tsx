@@ -86,8 +86,8 @@ function App() {
           {/* Rutas módulo IOT */}
           <Route path="/iot/principal" element={<Principal><HomePage /></Principal>} />
           <Route path="/crear-sensor" element={<Principal><CrearSensor /></Principal>} />
-          <Route path="/iot/sensores" element={<Principal><Sensores /></Principal>} /> 
-          <Route path="/iot/Editar-Sensor/:id" element={<Principal><EditarSensor /></Principal>} />
+          <Route path="/sensores" element={<Principal><Sensores /></Principal>} /> 
+          <Route path="/Editar-Sensor/:id" element={<Principal><EditarSensor /></Principal>} />
           <Route path="/lotes" element={<Principal><LotesPage /></Principal>} />
           <Route path="/crear-lote" element={<Principal><CrearLote /></Principal>} />
           <Route path="/Editarlote/:id" element={<Principal><EditarLote /></Principal>} />

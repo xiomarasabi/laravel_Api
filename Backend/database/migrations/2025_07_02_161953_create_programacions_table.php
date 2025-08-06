@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('programacion', function (Blueprint $table) {
             $table->id('id_programacion');
-            $table->string('estado', 50)->nullable(false);
-            $table->date('fecha_programada')->nullable(false);
-            $table->integer('duracion')->nullable(false);
+            $table->enum('estado', ['pendiente', 'completado', 'cancelado'])->default('pendiente');
+            $table->date('fecha_programada');
+            $table->time('duracion');
             $table->unsignedBigInteger('fk_id_asignacion_actividad');
             $table->unsignedBigInteger('fk_id_calendario_lunar');
-            $table->foreign('fk_id_asignacion_actividad')->references('id_asignacion_actividad')->on('asignacion__actividades')->onDelete('cascade');
+            $table->foreign('fk_id_asignacion_actividad')->references('id_asignacion_actividad')->on('asignacion_actividades')->onDelete('cascade');
             $table->foreign('fk_id_calendario_lunar')->references('id_calendario_lunar')->on('calendario_lunar')->onDelete('cascade');
             $table->timestamps();
         });

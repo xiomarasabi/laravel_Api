@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Sensores } from "./useEditarSensor";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, '') || 'http://localhost:3000';
 
 export const useSensorPorId = (id: string) => {
-  return useQuery<Sensores>({
+  return useQuery<Sensores, Error>({
     queryKey: ["sensor", id],
     queryFn: async () => {
       const token = localStorage.getItem("token");
@@ -13,8 +13,7 @@ export const useSensorPorId = (id: string) => {
         throw new Error("No se ha encontrado un token de autenticación");
       }
 
-      const baseUrl = apiUrl.endsWith('/') ? apiUrl : `${apiUrl}/`;
-      const url = `${baseUrl}sensores/${id}`;
+      const url = `${apiUrl}/sensores/${id}`;
 
       console.log("📡 Enviando solicitud GET a:", url);
 
@@ -25,12 +24,24 @@ export const useSensorPorId = (id: string) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("✅ Sensor obtenido:", response.data);
-        return response.data.result; // Ajusta según la estructura de la respuesta del backend
+        const data = response.data;
+        console.log("✅ Respuesta de la API:", data);
+
+        // Ajuste para manejar diferentes estructuras de respuesta
+        if (data.result && typeof data.result === 'object') {
+          return data.result as Sensores;
+        } else if (data.id && typeof data === 'object') {
+          return data as Sensores;
+        } else {
+          throw new Error("Formato de respuesta inesperado del backend");
+        }
       } catch (error: any) {
         console.error("❌ Error al obtener sensor:", error.response?.data || error.message);
         throw new Error(error.response?.data?.msg || "Error al obtener el sensor");
       }
     },
+    gcTime: 1000 * 60 * 10,
+    retry: 2,
+    staleTime: 1000 * 60 * 5,
   });
 };

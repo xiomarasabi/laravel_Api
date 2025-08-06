@@ -5,10 +5,11 @@ const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export interface Lotes {
     id: number;
-    fk_id_ubicacion: number;
+    fk_id_ubicacion: number; // Para enviar al backend
     dimension: number;
     nombre_lote: string;
     estado: string;
+    nombre_ubicacion?: string; // Opcional, devuelto por la API
 }
 
 export const useEditarLote = () => {
@@ -35,7 +36,7 @@ export const useEditarLote = () => {
                 const { data } = await axios.put(`${apiUrl}lotes/${id}`, datos, {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`, // Agregado para autenticación
+                        Authorization: `Bearer ${token}`,
                     },
                 });
                 return data;

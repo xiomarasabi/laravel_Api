@@ -16,17 +16,15 @@ export interface Insumo {
 // Función para obtener los insumos con manejo de errores y token
 const fetchInsumo = async (): Promise<Insumo[]> => {
     try {
-        // Retrieve token from localStorage
-        // const token = localStorage.getItem('token'); 
-
-        //if (!token) {
-        //    throw new Error('No se encontró el token de autenticación');
-        //}
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
 
         const { data } = await axios.get(`${apiUrl}insumos/`, {
-            //headers: {
-            //    Authorization: `Bearer ${token}`, 
-            //},
+            headers: {
+                Authorization: `Bearer ${token}`, 
+            },
         });
         return data;
     } catch (error) {

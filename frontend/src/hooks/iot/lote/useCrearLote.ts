@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:3000';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export interface Lote {
   id: number;
@@ -11,58 +11,35 @@ export interface Lote {
   estado: string;
 }
 
-interface BackendError {
-  msg: string;
-}
 
-interface ApiResponse {
-  msg: string;
-  lote?: Lote;
-}
 
 export const useCrearLote = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation<Lote, Error, Omit<Lote, 'id'>>({
-    mutationFn: async (nuevoLote: Omit<Lote, 'id'>) => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No se ha encontrado un token de autenticación');
-      }
-
-      console.log('URL completa:', `${apiUrl}/lotes`);
-      console.log('Datos enviados:', nuevoLote);
-
-      try {
-        const { data } = await axios.post<ApiResponse>(`${apiUrl}/lotes`, nuevoLote, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        console.log('Respuesta del backend:', data);
-
-        return {
-          ...nuevoLote,
-          id: data.lote?.id || 0,
-        };
-      } catch (error) {
-        const err = error as AxiosError<BackendError>;
-        console.error('Error en la solicitud POST:', {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status,
-        });
-        throw new Error(err.response?.data?.msg || 'Error al crear el lote');
-      }
-    },
-    onSuccess: () => {
-      console.log('Lote creado, invalidando caché de lotes');
-      queryClient.invalidateQueries({ queryKey: ['lotes'] });
-    },
-    onError: (error: Error) => {
-      console.error('Error al crear el lote:', error.message);
-    },
-  });
+    return useMutation({
+        mutationFn: async (nuevoHerramienta: Lote) => {
+            const token = localStorage.getItem("token");
+            console.log(token);
+            console.log(nuevoHerramienta)
+            if (!token) {
+                throw new Error("No se ha encontrado un token de autenticación");
+            }
+            const data  = await axios.post(
+                `${apiUrl}lotes/`,
+                nuevoHerramienta,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["Lote"] });
+        },
+        onError: (error: any) => {
+            console.error("Error al crear el herramienta:", error.message);
+        },
+    });
 };

@@ -23,7 +23,7 @@ export interface Cultivo {
 
 export interface TipoResiduo {
   id: number;
-  nombre_residuo: string; // Cambiado de 'nombre' a 'nombre_residuo'
+  nombre_residuo: string;
 }
 
 const fetchResiduos = async (): Promise<Residuo[]> => {
@@ -36,35 +36,37 @@ const fetchResiduos = async (): Promise<Residuo[]> => {
   }
 
   try {
-    const { data } = await axios.get(`${apiUrl}/residuos`, {
+    const response = await axios.get(`${apiUrl}/residuos`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (!data || !Array.isArray(data)) {
-      console.error('Formato de datos inesperado:', data);
+    console.log('Respuesta cruda de residuos:', response);
+
+    if (!response.data || !Array.isArray(response.data)) {
+      console.error('Formato de datos inesperado:', response.data);
       throw new Error('Los datos de residuos no tienen el formato esperado.');
     }
 
-    const mappedData = data.map((residuo: any) => {
-      console.log('Datos del residuo:', residuo); // Depuración adicional
+    const mappedData = response.data.map((residuo: any) => {
+      console.log('Datos del residuo antes de mapear:', residuo);
       return {
         id: residuo.id,
-        nombre: residuo.nombre,
-        fecha: residuo.fecha,
-        descripcion: residuo.descripcion,
-        fk_id_tipo_residuo: residuo.fk_id_tipo_residuo,
-        fk_id_cultivo: residuo.fk_id_cultivo,
+        nombre: residuo.nombre || 'Sin nombre',
+        fecha: residuo.fecha || 'Sin fecha',
+        descripcion: residuo.descripcion || 'Sin descripción',
+        fk_id_tipo_residuo: residuo.fk_id_tipo_residuo || null,
+        fk_id_cultivo: residuo.fk_id_cultivo || null,
         tipo_residuo: {
-          id: residuo.tipo_residuo?.id,
-          nombre_residuo: residuo.tipo_residuo?.nombre_residuo || 'Sin nombre', // Cambiado de 'nombre' a 'nombre_residuo'
+          id: residuo.tipo_residuo?.id || null,
+          nombre_residuo: residuo.tipo_residuo?.nombre_residuo || 'Sin tipo',
         },
         cultivo: {
-          id: residuo.cultivo?.id,
-          nombre_cultivo: residuo.cultivo?.nombre_cultivo,
-          fecha_plantacion: residuo.cultivo?.fecha_plantacion,
-          descripcion: residuo.cultivo?.descripcion,
+          id: residuo.cultivo?.id || null,
+          nombre_cultivo: residuo.cultivo?.nombre_cultivo || 'Sin cultivo',
+          fecha_plantacion: residuo.cultivo?.fecha_plantacion || 'Sin fecha',
+          descripcion: residuo.cultivo?.descripcion || 'Sin descripción',
         },
       };
     });
@@ -76,7 +78,9 @@ const fetchResiduos = async (): Promise<Residuo[]> => {
       const message = error.response?.data?.message || error.message;
       console.error('Error al obtener residuos:', {
         status: error.response?.status,
+        data: error.response?.data,
         message,
+        url: error.config?.url,
       });
       throw new Error(`No se pudo obtener la lista de residuos: ${message}`);
     }

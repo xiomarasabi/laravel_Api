@@ -68,7 +68,7 @@ const Lotes = () => {
       index + 1,
       item.nombre_lote,
       item.dimension,
-      item.fk_id_ubicacion ? `${item.fk_id_ubicacion.latitud}, ${item.fk_id_ubicacion.longitud}` : 'Sin ubicación',
+      item.fk_id_ubicacion , 'Sin ubicación',
       item.estado,
     ]);
 
@@ -88,9 +88,7 @@ const Lotes = () => {
     id: lote.id,
     nombre: lote.nombre_lote,
     dimension: lote.dimension,
-    ubicacion: lote.fk_id_ubicacion
-      ? `${lote.fk_id_ubicacion.latitud}, ${lote.fk_id_ubicacion.longitud}`
-      : 'Sin ubicación',
+    ubicacion: lote.fk_id_ubicacion,
     estado: lote.estado,
   }));
 
